@@ -1,0 +1,24 @@
+package com.vn.vodka_server.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vn.vodka_server.dto.response.ApiResponse;
+import com.vn.vodka_server.service.GenreService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/genres")
+@RequiredArgsConstructor
+public class GenreController {
+
+    private final GenreService genreService;
+
+    @GetMapping
+    public ResponseEntity<ApiResponse> getAllGenres() {
+        return ResponseEntity.ok(ApiResponse.success("Success", genreService.getAllGenres()));
+    }
+}
