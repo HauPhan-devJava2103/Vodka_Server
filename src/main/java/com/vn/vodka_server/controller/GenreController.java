@@ -19,6 +19,7 @@ public class GenreController {
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAllGenres() {
+        // Trả về danh sách thể loại đã được chuyển đổi thành DTO (GenreResponse)
         return ResponseEntity.ok(ApiResponse.success("Success", genreService.getAllGenres()));
     }
 }

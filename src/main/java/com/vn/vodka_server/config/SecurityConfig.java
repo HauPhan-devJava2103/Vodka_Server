@@ -14,7 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.http.HttpMethod;
 import com.vn.vodka_server.security.CustomUserDetailsService;
 import com.vn.vodka_server.security.JwtAuthenticationFilter;
 
@@ -35,6 +35,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/upload/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/genres").permitAll() // Cho phép xem thể loại không cần
+                                                                                    // đăng nhập
+                        .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
                         .anyRequest().authenticated() // Còn lại phải có Token
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Không lưu
