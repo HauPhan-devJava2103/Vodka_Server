@@ -29,7 +29,7 @@ public class Authentication {
     public ResponseEntity<ApiResponse> sendOtp(@Valid @RequestBody SendOtpRequest request) {
         try {
             authServiceImpl.sendOtp(request);
-            return ResponseEntity.ok(ApiResponse.success("OTP sent successfully", null));
+            return ResponseEntity.ok(ApiResponse.success("OTP đã được gửi", null));
         } catch (Exception e) {
             return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
         }
@@ -38,8 +38,8 @@ public class Authentication {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            authServiceImpl.register(request);
-            return ResponseEntity.ok(ApiResponse.success("Register successfully", null));
+            LoginResponse response = authServiceImpl.register(request);
+            return ResponseEntity.ok(ApiResponse.success("Đăng ký thành công", response));
         } catch (Exception e) {
             return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
         }
@@ -49,7 +49,7 @@ public class Authentication {
     public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request) {
         try {
             LoginResponse response = authServiceImpl.login(request);
-            return ResponseEntity.ok(ApiResponse.success("Login successfully", response));
+            return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công", response));
         } catch (Exception e) {
             return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
         }

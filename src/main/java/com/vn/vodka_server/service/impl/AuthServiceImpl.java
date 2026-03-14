@@ -45,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void register(RegisterRequest request) {
+    public LoginResponse register(RegisterRequest request) {
 
         String email = request.getEmail();
 
@@ -53,15 +53,34 @@ public class AuthServiceImpl implements AuthService {
         // 2. Xác thực OTP
         verifyOtp(request.getEmail(), request.getOtp());
 
-        // 3. Tạo User mới
+        // 3. Tạo name từ email (lấy phần trước @)
+        String name = email.substring(0, email.indexOf("@"));
+
+        // 4. Ảnh đại diện mặc định
+        String defaultAvatar = "https://res.cloudinary.com/dcrxiky8s/image/upload/v1773409663/avatardefault.png";
+
+        // 5. Tạo User mới
         User user = User.builder()
                 .email(email)
+                .fullName(name)
+                .avatarUrl(defaultAvatar)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(ERole.USER)
                 .status(EStatus.ACTIVE)
                 .build();
 
         userRepository.save(user);
+
+        // 6. Tạo JWT token
+        UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
+                .password(user.getPassword())
+                .roles(user.getRole().name())
+                .build();
+        String token = jwtUtils.generateToken(userDetails);
+
+        // 7. Trả về response giống login
+        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl());
+        return new LoginResponse(token, userInfo);
     }
 
     @Override

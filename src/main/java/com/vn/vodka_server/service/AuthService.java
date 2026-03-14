@@ -13,7 +13,7 @@ public interface AuthService {
     void sendOtp(SendOtpRequest request);
 
     // UC2
-    void register(RegisterRequest request);
+    LoginResponse register(RegisterRequest request);
 
     // UC1
     LoginResponse login(LoginRequest request);
