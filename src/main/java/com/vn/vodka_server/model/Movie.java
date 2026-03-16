@@ -1,13 +1,20 @@
 package com.vn.vodka_server.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,11 +48,13 @@ public class Movie extends AbstractEntity {
     @Column(name = "description")
     private String description;
 
-    // Thêm mới (Văn)
     @Column(name = "view_count")
     private Long viewCount;
 
-    // Relation Ship
+    @Column(name = "favorites")
+    private Long favorites;
+
+    // Relationship
 
     // Movie - Genre
     @ManyToMany
@@ -57,4 +66,15 @@ public class Movie extends AbstractEntity {
     @JoinTable(name = "movie_tag", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
 
+    // Movie - Season
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OrderBy("seasonNumber ASC")
+    @JsonIgnore
+    private List<Season> seasons = new ArrayList<>();
+
+    // Movie - Review
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Review> reviews = new ArrayList<>();
 }
+
