@@ -15,7 +15,7 @@ public class ResetPasswordRequest implements Serializable {
 
     @NotBlank(message = "Password không được để trống")
     @StrongPassword
-    private String password;
+    private String newPassword;
 
     @NotBlank
     private String resetToken;

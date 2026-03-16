@@ -7,5 +7,5 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class LoginResponse {
     private String accessToken;
-    private UserInfo userInfo;
+    private UserInfo user;
 }

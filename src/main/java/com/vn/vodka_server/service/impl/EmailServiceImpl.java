@@ -1,8 +1,13 @@
 package com.vn.vodka_server.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import com.vn.vodka_server.service.EmailService;
 
@@ -17,24 +22,34 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
+
+    private static final String OTP_EXPIRY_DISPLAY = "30 giây";
 
     @Override
     public void sendOtpEmail(String toEmail, String otp) {
         try {
+            // Prepare Thymeleaf context
+            Context context = new Context();
+            context.setVariable("email", toEmail);
+            context.setVariable("expiryDisplay", OTP_EXPIRY_DISPLAY);
+
+            // Split OTP into individual digits
+            List<String> otpDigits = new ArrayList<>();
+            for (char c : otp.toCharArray()) {
+                otpDigits.add(String.valueOf(c));
+            }
+            context.setVariable("otpDigits", otpDigits);
+
+            // Render HTML from template
+            String htmlContent = templateEngine.process("otp-email", context);
+
+            // Send email
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setTo(toEmail);
-            helper.setSubject("Mã xác thực OTP - Vodka Server");
-            helper.setText(
-                    "<div style='font-family:Arial,sans-serif; padding:20px;'>"
-                            + "<h2>Xác thực tài khoản</h2>"
-                            + "<p>Mã OTP của bạn là:</p>"
-                            + "<h1 style='color:#4CAF50; letter-spacing:5px;'>" + otp + "</h1>"
-                            + "<p>Mã có hiệu lực trong <strong>1 phút</strong>.</p>"
-                            + "<p>Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>"
-                            + "</div>",
-                    true);
+            helper.setSubject("Mã xác thực OTP - VODKA");
+            helper.setText(htmlContent, true);
 
             mailSender.send(message);
             log.info("OTP email sent to {}", toEmail);

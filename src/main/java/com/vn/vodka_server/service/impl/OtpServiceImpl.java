@@ -19,7 +19,7 @@ public class OtpServiceImpl implements OtpService {
     private final Map<String, ResetTokenData> resetTokenStorage = new ConcurrentHashMap<>();
 
     private static final int OTP_LENGTH = 6;
-    private static final int OTP_EXPIRY_MINUTES = 1;
+    private static final int OTP_EXPIRY_SECONDS = 30;
     private static final int RESET_TOKEN_EXPIRY_MINUTES = 10;
 
     private record OtpData(String otp, LocalDateTime createdAt) {
@@ -54,7 +54,7 @@ public class OtpServiceImpl implements OtpService {
         }
 
         // Kiểm tra hết hạn
-        if (otpData.createdAt().plusMinutes(OTP_EXPIRY_MINUTES)
+        if (otpData.createdAt().plusSeconds(OTP_EXPIRY_SECONDS)
                 .isBefore(LocalDateTime.now())) {
             otpStorage.remove(email);
             log.warn("OTP expired for email: {}", email);
