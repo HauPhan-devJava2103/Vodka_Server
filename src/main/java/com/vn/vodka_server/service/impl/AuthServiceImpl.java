@@ -35,6 +35,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
+    private final String IMAGE_DEFAULT = "https://res.cloudinary.com/dcrxiky8s/image/upload/v1773409663/avatardefault.png";
+
     @Override
     public void sendOtp(SendOtpRequest request) {
         String email = request.getEmail();
@@ -57,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
         String name = email.substring(0, email.indexOf("@"));
 
         // 4. Ảnh đại diện mặc định
-        String defaultAvatar = "https://res.cloudinary.com/dcrxiky8s/image/upload/v1773409663/avatardefault.png";
+        String defaultAvatar = IMAGE_DEFAULT;
 
         // 5. Tạo User mới
         User user = User.builder()
