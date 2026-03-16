@@ -3,11 +3,13 @@ package com.vn.vodka_server.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 
 import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
 import com.vn.vodka_server.dto.response.GenreResponse;
 import com.vn.vodka_server.dto.response.TagResponse;
+import com.vn.vodka_server.dto.response.TrendingMovieResponse;
 import com.vn.vodka_server.repository.MovieRepository;
 import com.vn.vodka_server.service.MovieService;
 
@@ -47,5 +49,16 @@ public class MovieServiceImpl implements MovieService {
                                                 .description(movie.getDescription())
                                                 .build())
                                 .collect(Collectors.toList());
+        }
+
+        // Lấy phim thịnh hành nhất (phim có lượt xem cao nhất)
+        @Override
+        public List<TrendingMovieResponse> getTrendingMovies(int limit) {
+                return movieRepository.findTrendingMovies(Limit.of(limit)).stream()
+                                .map(movie -> TrendingMovieResponse.builder()
+                                                .id(String.valueOf(movie.getId()))
+                                                .title(movie.getTitle())
+                                                .build())
+                                .toList();
         }
 }

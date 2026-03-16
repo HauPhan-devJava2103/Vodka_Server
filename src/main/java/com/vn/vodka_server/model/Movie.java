@@ -41,6 +41,10 @@ public class Movie extends AbstractEntity {
     @Column(name = "description")
     private String description;
 
+    // Thêm mới (Văn)
+    @Column(name = "view_count")
+    private Long viewCount;
+
     // Relation Ship
 
     // Movie - Genre
