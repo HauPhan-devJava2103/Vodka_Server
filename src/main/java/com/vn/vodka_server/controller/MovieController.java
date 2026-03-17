@@ -34,7 +34,7 @@ public class MovieController {
                 movieService.getTrendingMovies(limit)));
     }
 
-    // UC9: Lấy chi tiết phim
+    // API9: Lấy chi tiết phim
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getMovieById(@PathVariable Long id) {
         try {
@@ -44,4 +44,16 @@ public class MovieController {
             return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
         }
     }
+
+    // API10: Lấy danh sách đánh giá
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<ApiResponse> getReviews(@PathVariable Long id, @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+        try {
+            return ResponseEntity.ok(movieService.getReviews(id, page, limit));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+    }
+
 }

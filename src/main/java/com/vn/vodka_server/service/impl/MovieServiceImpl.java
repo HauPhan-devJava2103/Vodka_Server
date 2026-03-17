@@ -5,13 +5,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.vn.vodka_server.dto.response.ApiResponse;
 import com.vn.vodka_server.dto.response.EpisodeResponse;
 import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
 import com.vn.vodka_server.dto.response.GenreResponse;
 import com.vn.vodka_server.dto.response.MovieDetailResponse;
 import com.vn.vodka_server.dto.response.MovieStatsResponse;
+import com.vn.vodka_server.dto.response.PaginationMeta;
 import com.vn.vodka_server.dto.response.ReviewResponse;
 import com.vn.vodka_server.dto.response.SeasonResponse;
 import com.vn.vodka_server.dto.response.TagResponse;
@@ -100,7 +106,7 @@ public class MovieServiceImpl implements MovieService {
                 // Map Movie
 
                 MovieDetailResponse response = MovieDetailResponse.builder()
-                                .featuredMovie(mapMovieToFeaturedMovieResponse(movie))
+                                .movie(mapMovieToFeaturedMovieResponse(movie))
                                 .episodes(mapSeasonToSeasonResponse(season))
                                 .reviews(mapReviewToReviewResponse(review))
                                 .relatedMovies(relatedMovies.stream().map(this::mapMovieToFeaturedMovieResponse)
@@ -116,6 +122,23 @@ public class MovieServiceImpl implements MovieService {
 
         }
 
+        @Override
+        public ApiResponse getReviews(Long id, int page, int limit) {
+                Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdAt").descending());
+                Page<Review> reviewPage = reviewRepository.findByMovieIdOrderByCreatedAtDesc(id, pageable);
+
+                List<ReviewResponse> data = mapReviewToReviewResponse(reviewPage.getContent());
+
+                PaginationMeta pagination = PaginationMeta.builder()
+                                .totalItems(reviewPage.getTotalElements())
+                                .totalPages(reviewPage.getTotalPages())
+                                .currentPage(page)
+                                .pageSize(limit)
+                                .build();
+                return ApiResponse.success("Lấy danh sách đánh giá thành công", data, pagination);
+        }
+
+        // HELPER
         // Mapper Movie sang FeaturedMovieResponse
         private FeaturedMovieResponse mapMovieToFeaturedMovieResponse(Movie movie) {
                 return FeaturedMovieResponse.builder()
