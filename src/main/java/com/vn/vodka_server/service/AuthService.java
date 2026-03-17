@@ -2,6 +2,7 @@ package com.vn.vodka_server.service;
 
 import java.util.Map;
 
+import com.vn.vodka_server.dto.request.LoginGoogleRequest;
 import com.vn.vodka_server.dto.request.LoginRequest;
 import com.vn.vodka_server.dto.request.RegisterRequest;
 import com.vn.vodka_server.dto.request.ResetPasswordRequest;
@@ -26,4 +27,8 @@ public interface AuthService {
 
     // UC6 - Quên mật khẩu: đặt lại mật khẩu
     void resetPassword(ResetPasswordRequest request);
+
+    // Login Google - OAuth2
+    LoginResponse googleLogin(LoginGoogleRequest request);
+
 }

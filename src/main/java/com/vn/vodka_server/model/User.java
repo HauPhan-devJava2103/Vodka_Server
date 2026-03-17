@@ -3,6 +3,7 @@ package com.vn.vodka_server.model;
 import java.util.Date;
 
 import com.vn.vodka_server.util.EGender;
+import com.vn.vodka_server.util.EProvider;
 import com.vn.vodka_server.util.ERole;
 import com.vn.vodka_server.util.EStatus;
 
@@ -58,5 +59,9 @@ public class User extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private ERole role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    private EProvider provider;
 
 }
