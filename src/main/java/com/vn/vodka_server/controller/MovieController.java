@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,4 +33,27 @@ public class MovieController {
         return ResponseEntity.ok(ApiResponse.success("Success",
                 movieService.getTrendingMovies(limit)));
     }
+
+    // API9: Lấy chi tiết phim
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getMovieById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết phim thành công",
+                    movieService.getMovieById(id)));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    // API10: Lấy danh sách đánh giá
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<ApiResponse> getReviews(@PathVariable Long id, @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+        try {
+            return ResponseEntity.ok(movieService.getReviews(id, page, limit));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+    }
+
 }

@@ -1,14 +1,16 @@
 package com.vn.vodka_server.repository;
 
 import java.util.List;
+import java.util.Set;
 
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.vn.vodka_server.model.Movie;
 
@@ -29,4 +31,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     // Tìm phim hot (nhiều view nhất) có phân trang
     Page<Movie> findAllByOrderByViewCountDesc(Pageable pageable);
 
+    // Lấy danh sách gợi ý phim liên quan về thể loại
+    @Query("SELECT DISTINCT m FROM Movie m JOIN m.genres g WHERE g.id IN :genreIds AND m.id <> :movieId")
+    List<Movie> findRelatedMovies(@Param("genreIds") Set<Long> genreIds, @Param("movieId") Long movieId, Limit limit);
 }
