@@ -1,17 +1,24 @@
 package com.vn.vodka_server.controller;
 
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.vn.vodka_server.dto.request.MediaConfirmRequest;
 import com.vn.vodka_server.dto.response.ApiResponse;
 import com.vn.vodka_server.dto.response.UploadResponse;
 import com.vn.vodka_server.service.MediaService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/media")
@@ -22,6 +29,7 @@ public class MediaController {
 
     // 1. Lấy signature
     @GetMapping("/signature")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse> getSignature() {
         Map<String, Object> data = mediaService.getUploadSignature();
         return ResponseEntity.ok(ApiResponse.success("Lấy thông tin upload Cloudinary thành công", data));

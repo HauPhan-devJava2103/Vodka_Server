@@ -1,19 +1,25 @@
 package com.vn.vodka_server.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
 import com.cloudinary.Cloudinary;
 import com.cloudinary.api.ApiResponse;
 import com.cloudinary.utils.ObjectUtils;
 import com.vn.vodka_server.dto.request.MediaConfirmRequest;
 import com.vn.vodka_server.dto.response.UploadResponse;
+import com.vn.vodka_server.model.Media;
+import com.vn.vodka_server.repository.MediaRepository;
 import com.vn.vodka_server.service.MediaService;
+import com.vn.vodka_server.util.EMediaType;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +27,7 @@ import java.util.Map;
 public class MediaServiceImpl implements MediaService {
 
     private final Cloudinary cloudinary;
+    private final MediaRepository mediaRepository;
 
     @Value("${cloudinary.folder:vodka_server}")
     private String folderName;
@@ -61,6 +68,7 @@ public class MediaServiceImpl implements MediaService {
 
     // 2. Xác nhận Media
     @Override
+    @Transactional
     public UploadResponse confirmMedia(MediaConfirmRequest request) {
         String resourceType;
         if ("image".equals(request.getResourceType())) {
@@ -73,16 +81,28 @@ public class MediaServiceImpl implements MediaService {
             }
         } else {
             resourceType = "IMAGE";
-        }
 
-        // Xóa tag "tmp" → xác nhận file giữ lại vĩnh viễn
+        }
+        Media media = Media.builder()
+                .publicId(request.getPublicId())
+                .secureUrl(request.getSecureUrl())
+                .resourceType(EMediaType.valueOf(resourceType))
+                .format(request.getFormat())
+                .width(request.getWidth())
+                .height(request.getHeight())
+                .bytes(request.getBytes())
+                .duration(request.getDuration())
+                .build();
+        mediaRepository.save(media);
+
+        // Xóa tag "tmp" xác nhận file giữ lại vĩnh viễn
         try {
             cloudinary.uploader().removeTag("tmp",
                     new String[] { request.getPublicId() },
                     ObjectUtils.asMap("resource_type", request.getResourceType()));
         } catch (Exception e) {
             log.warn("Không thể xóa tag 'tmp' cho publicId={}: {}", request.getPublicId(), e.getMessage());
-            // Không throw — vẫn trả response cho frontend
+
         }
 
         // Map sang UploadResponse
