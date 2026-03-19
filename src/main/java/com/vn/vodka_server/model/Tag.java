@@ -26,6 +26,10 @@ public class Tag extends AbstractEntity {
     @Column(name = "name")
     private String name;
 
+    // Field slug để sử dụng trên URL thay cho ID (vd: phim-le, chieu-rap)
+    @Column(name = "slug", unique = true)
+    private String slug;
+
     // Relation Ship
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore // Chặn lỗi vòng lặp JSON

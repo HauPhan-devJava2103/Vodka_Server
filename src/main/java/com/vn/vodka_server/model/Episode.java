@@ -31,6 +31,13 @@ public class Episode extends AbstractEntity {
     @Column(name = "episode_number")
     private Integer episodeNumber;
 
+    // Add API11: Thêm đường dẫn video và mô tả cho tập phim
+    @Column(name = "video_url")
+    private String videoUrl;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
     // Relationship
 
     @ManyToOne

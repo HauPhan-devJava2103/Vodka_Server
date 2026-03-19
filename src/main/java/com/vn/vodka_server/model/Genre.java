@@ -27,6 +27,10 @@ public class Genre extends AbstractEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    // Field slug để sử dụng trên URL thay cho ID (vd: phim-bo, hanh-dong)
+    @Column(name = "slug", unique = true)
+    private String slug;
+
     // Relation Ship
     @ManyToMany(mappedBy = "genres")
     @JsonIgnore // Chặn lỗi vòng lặp vô tận
