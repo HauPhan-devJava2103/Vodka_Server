@@ -63,5 +63,4 @@ public class User extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "provider")
     private EProvider provider;
-
 }

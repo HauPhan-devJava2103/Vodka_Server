@@ -1,11 +1,13 @@
 package com.vn.vodka_server.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vn.vodka_server.dto.response.*;
 import com.vn.vodka_server.exception.BadRequestException;
@@ -27,6 +29,7 @@ public class MovieServiceImpl implements MovieService {
         private final GenreRepository genreRepository;
         private final UserRepository userRepository;
         private final EpisodeRepository episodeRepository;
+        private final FavoriteRepository favoriteRepository;
 
         // Lấy 8 phim nổi bật nhất (8 phim có rating cao nhất)
         @Override
@@ -430,5 +433,74 @@ public class MovieServiceImpl implements MovieService {
                                                 .map(t -> new FilterMovieResponse.TagInfo(t.getSlug(), t.getName()))
                                                 .toList())
                                 .build();
+        }
+
+        // Toggle yêu thích phim: thêm nếu chưa yêu thích, xóa nếu đã yêu thích
+        @Override
+        @Transactional
+        public String toggleFavorite(String email, Long movieId) {
+
+                // Tìm user theo email
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Không tìm thấy tài khoản với email: " + email));
+
+                // Tìm phim theo id
+                Movie movie = movieRepository.findById(movieId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Không tìm thấy phim với id = " + movieId));
+
+                Optional<Favorite> existing = favoriteRepository.findByUserIdAndMovieId(user.getId(), movieId);
+
+                if (existing.isPresent()) {
+                        // Đã yêu thích → bỏ yêu thích và giảm counter
+                        favoriteRepository.delete(existing.get());
+                        if (movie.getFavorites() != null && movie.getFavorites() > 0) {
+                                movie.setFavorites(movie.getFavorites() - 1);
+                        }
+                        movieRepository.save(movie);
+                        return "Đã bỏ yêu thích phim";
+                } else {
+                        // Chưa yêu thích → thêm vào và tăng counter
+                        Favorite favorite = Favorite.builder()
+                                        .user(user)
+                                        .movie(movie)
+                                        .build();
+                        favoriteRepository.save(favorite);
+                        movie.setFavorites(movie.getFavorites() == null ? 1L : movie.getFavorites() + 1);
+                        movieRepository.save(movie);
+                        return "Đã thêm phim vào danh sách yêu thích";
+                }
+        }
+
+        // Lấy danh sách phim yêu thích của user, có phân trang
+        @Override
+        public Page<FavoriteMovieResponse> getFavorites(String email, int page, int limit) {
+
+                if (page < 1)
+                        throw new BadRequestException("Số trang phải bắt đầu từ 1");
+
+                // Tìm user theo email
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Không tìm thấy tài khoản với email: " + email));
+
+                Pageable pageable = PageRequest.of(page - 1, limit);
+
+                // Lấy danh sách yêu thích, mới nhất lên đầu
+                Page<Favorite> favoritePage = favoriteRepository
+                                .findByUserIdOrderByCreatedAtDesc(user.getId(), pageable);
+
+                // Map sang DTO
+                return favoritePage.map(fav -> FavoriteMovieResponse.builder()
+                                .id(String.valueOf(fav.getId()))
+                                .movieId(String.valueOf(fav.getMovie().getId()))
+                                .title(fav.getMovie().getTitle())
+                                .posterUrl(fav.getMovie().getPostUrl())
+                                .rating(fav.getMovie().getRating())
+                                .addedAt(fav.getCreatedAt() != null
+                                                ? fav.getCreatedAt().toInstant().toString()
+                                                : null)
+                                .build());
         }
 }

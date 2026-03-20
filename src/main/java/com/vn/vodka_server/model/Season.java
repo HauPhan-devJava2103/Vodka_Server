@@ -45,5 +45,6 @@ public class Season extends AbstractEntity {
 
     @OneToMany(mappedBy = "season", cascade = CascadeType.ALL)
     @OrderBy("episodeNumber ASC")
+    @Builder.Default
     private List<Episode> episodes = new ArrayList<>();
 }

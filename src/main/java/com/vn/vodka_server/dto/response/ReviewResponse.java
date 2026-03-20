@@ -1,5 +1,7 @@
 package com.vn.vodka_server.dto.response;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +19,8 @@ public class ReviewResponse {
     private Double rating;
     private String content;
     private String createdAt;
+
+    // Danh sách phản hồi của review này
+    private List<ReviewReplyResponse> replies;
 
 }

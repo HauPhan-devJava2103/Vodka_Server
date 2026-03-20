@@ -33,5 +33,6 @@ public class Tag extends AbstractEntity {
     // Relation Ship
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore // Chặn lỗi vòng lặp JSON
+    @Builder.Default
     private Set<Movie> movies = new HashSet<>();
 }
