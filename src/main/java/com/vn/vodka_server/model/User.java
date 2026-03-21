@@ -1,6 +1,8 @@
 package com.vn.vodka_server.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.vn.vodka_server.util.EGender;
 import com.vn.vodka_server.util.EProvider;
@@ -11,6 +13,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -60,6 +63,9 @@ public class User extends AbstractEntity {
     @Column(name = "role")
     private ERole role;
 
+    // User - Media (danh sách media user đã upload)
+    @OneToMany(mappedBy = "uploadedBy")
+    private List<Media> medias = new ArrayList<>();
     @Enumerated(EnumType.STRING)
     @Column(name = "provider")
     private EProvider provider;

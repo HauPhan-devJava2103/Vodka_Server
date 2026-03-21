@@ -66,6 +66,10 @@ public class Movie extends AbstractEntity {
     @JoinTable(name = "movie_tag", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
 
+    // Movie - Media (danh sách media thuộc phim này)
+    @OneToMany(mappedBy = "movie")
+    private List<Media> medias = new ArrayList<>();
+
     // Movie - Season
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     @OrderBy("seasonNumber ASC")
