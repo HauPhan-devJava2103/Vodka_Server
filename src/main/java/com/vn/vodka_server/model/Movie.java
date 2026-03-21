@@ -1,6 +1,8 @@
 package com.vn.vodka_server.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -8,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,5 +59,9 @@ public class Movie extends AbstractEntity {
     @ManyToMany
     @JoinTable(name = "movie_tag", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
+
+    // Movie - Media (danh sách media thuộc phim này)
+    @OneToMany(mappedBy = "movie")
+    private List<Media> medias = new ArrayList<>();
 
 }

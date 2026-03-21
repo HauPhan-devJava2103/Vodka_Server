@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.cloudinary.Cloudinary;
@@ -13,7 +14,11 @@ import com.cloudinary.utils.ObjectUtils;
 import com.vn.vodka_server.dto.request.MediaConfirmRequest;
 import com.vn.vodka_server.dto.response.UploadResponse;
 import com.vn.vodka_server.model.Media;
+import com.vn.vodka_server.model.Movie;
+import com.vn.vodka_server.model.User;
 import com.vn.vodka_server.repository.MediaRepository;
+import com.vn.vodka_server.repository.MovieRepository;
+import com.vn.vodka_server.repository.UserRepository;
 import com.vn.vodka_server.service.MediaService;
 import com.vn.vodka_server.util.EMediaType;
 
@@ -28,6 +33,8 @@ public class MediaServiceImpl implements MediaService {
 
     private final Cloudinary cloudinary;
     private final MediaRepository mediaRepository;
+    private final UserRepository userRepository;
+    private final MovieRepository movieRepository;
 
     @Value("${cloudinary.folder:vodka_server}")
     private String folderName;
@@ -83,6 +90,19 @@ public class MediaServiceImpl implements MediaService {
             resourceType = "IMAGE";
 
         }
+        // Lấy user hiện tại từ JWT token
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user đang đăng nhập"));
+
+        // Movie id
+        Movie movie = null;
+        if (request.getMovieId() != null) {
+            movie = movieRepository.findById(request.getMovieId())
+                    .orElseThrow(() -> new RuntimeException(
+                            "Không tìm thấy phim với id = " + request.getMovieId()));
+        }
+
         Media media = Media.builder()
                 .publicId(request.getPublicId())
                 .secureUrl(request.getSecureUrl())
@@ -92,6 +112,8 @@ public class MediaServiceImpl implements MediaService {
                 .height(request.getHeight())
                 .bytes(request.getBytes())
                 .duration(request.getDuration())
+                .movie(movie)
+                .uploadedBy(currentUser)
                 .build();
         mediaRepository.save(media);
 

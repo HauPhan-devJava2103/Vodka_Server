@@ -6,6 +6,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,5 +50,15 @@ public class Media extends AbstractEntity {
 
     @Column(name = "duration")
     private Double duration;
+
+    // Media thuộc phim nào (nullable: vì có thể là avatar user, không thuộc phim)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
+
+    // Ai đã upload media này
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uploaded_by")
+    private User uploadedBy;
 
 }

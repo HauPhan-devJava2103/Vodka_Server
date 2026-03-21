@@ -20,4 +20,7 @@ public class MediaConfirmRequest {
     private Long bytes;
     private Double duration;
     private Boolean isAudio;
+
+    // ID phim
+    private Long movieId;
 }
