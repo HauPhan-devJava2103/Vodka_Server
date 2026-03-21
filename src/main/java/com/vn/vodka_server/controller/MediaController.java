@@ -37,6 +37,7 @@ public class MediaController {
 
     // 2. Xác nhận upload
     @PostMapping("/confirm")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ApiResponse> confirmMedia(@Valid @RequestBody MediaConfirmRequest request) {
         try {
             UploadResponse data = mediaService.confirmMedia(request);
