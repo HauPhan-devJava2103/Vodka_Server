@@ -9,6 +9,7 @@ import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
 import com.vn.vodka_server.dto.response.FilterMovieResponse;
 import com.vn.vodka_server.dto.response.MovieDetailResponse;
 import com.vn.vodka_server.dto.response.TrendingMovieResponse;
+import com.vn.vodka_server.dto.response.FavoriteMovieResponse;
 import com.vn.vodka_server.dto.response.WatchMovieResponse;
 
 public interface MovieService {
@@ -46,4 +47,10 @@ public interface MovieService {
     // API12: Lọc phim đa điều kiện
     Page<FilterMovieResponse> filterMovies(String keyword, String tagSlug,
             List<String> genreSlugs, int page, int pageSize);
+
+    // Toggle yêu thích phim (thêm nếu chưa có, xóa nếu đã yêu thích)
+    String toggleFavorite(String email, Long movieId);
+
+    // Lấy danh sách phim yêu thích của user (có phân trang)
+    Page<FavoriteMovieResponse> getFavorites(String email, int page, int limit);
 }

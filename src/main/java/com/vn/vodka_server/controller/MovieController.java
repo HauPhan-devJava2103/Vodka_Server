@@ -6,11 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vn.vodka_server.dto.response.ApiResponse;
+import com.vn.vodka_server.dto.response.FavoriteMovieResponse;
 import com.vn.vodka_server.dto.response.PaginationMeta;
 import com.vn.vodka_server.dto.response.TrendingMovieResponse;
 import com.vn.vodka_server.service.MovieService;
 import com.vn.vodka_server.util.PaginationUtils;
 
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
@@ -143,6 +145,37 @@ public class MovieController {
         return ResponseEntity.ok(ApiResponse.builder()
                 .success(true)
                 .message("Lấy danh sách phim thành công")
+                .data(resultPage.getContent())
+                .pagination(meta)
+                .build());
+    }
+    // API13: Toggle yêu thích phìm (thêm / bỏ yêu thích, yêu cầu đăng nhập)
+    @PostMapping("/{movieId}/favorite")
+    public ResponseEntity<ApiResponse> toggleFavorite(
+            @PathVariable Long movieId,
+            Principal principal) {
+        try {
+            String message = movieService.toggleFavorite(principal.getName(), movieId);
+            return ResponseEntity.ok(ApiResponse.success(message, null));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    // API14: Lấy danh sách phìm yêu thích của user (có phân trang, yêu cầu đăng nhập)
+    @GetMapping("/favorites")
+    public ResponseEntity<ApiResponse> getFavorites(
+            Principal principal,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+
+        Page<FavoriteMovieResponse> resultPage = movieService.getFavorites(principal.getName(), page, limit);
+
+        PaginationMeta meta = PaginationUtils.buildPaginationMeta(resultPage, page);
+
+        return ResponseEntity.ok(ApiResponse.builder()
+                .success(true)
+                .message("Lấy danh sách yêu thích thành công")
                 .data(resultPage.getContent())
                 .pagination(meta)
                 .build());

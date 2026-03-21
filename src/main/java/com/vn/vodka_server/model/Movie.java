@@ -58,11 +58,13 @@ public class Movie extends AbstractEntity {
 
     // Movie - Genre
     @ManyToMany
+    @Builder.Default
     @JoinTable(name = "movie_genre", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private Set<Genre> genres = new HashSet<>();
 
     // Movie - Tag
     @ManyToMany
+    @Builder.Default
     @JoinTable(name = "movie_tag", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
 
@@ -74,11 +76,12 @@ public class Movie extends AbstractEntity {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     @OrderBy("seasonNumber ASC")
     @JsonIgnore
+    @Builder.Default
     private List<Season> seasons = new ArrayList<>();
 
     // Movie - Review
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @Builder.Default
     @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 }
-

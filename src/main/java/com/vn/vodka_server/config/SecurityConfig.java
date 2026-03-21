@@ -39,9 +39,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/upload/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/genres").permitAll() // Cho phép xem thể loại không cần
-                                                                                    // đăng nhập
+                        .requestMatchers(HttpMethod.GET, "/api/genres").permitAll() // Cho phép xem thể loại không cần đăng nhập
                         .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll() // Cho phép xem replies không cần đăng nhập
                         .anyRequest().authenticated() // Còn lại phải có Token
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

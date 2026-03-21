@@ -34,5 +34,6 @@ public class Genre extends AbstractEntity {
     // Relation Ship
     @ManyToMany(mappedBy = "genres")
     @JsonIgnore // Chặn lỗi vòng lặp vô tận
+    @Builder.Default
     private Set<Movie> movies = new HashSet<>();
 }
