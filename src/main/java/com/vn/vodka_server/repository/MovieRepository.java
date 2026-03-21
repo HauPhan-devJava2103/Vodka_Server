@@ -42,9 +42,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("SELECT m FROM Movie m ORDER BY m.rating DESC")
     List<Movie> findHighlyRatedMovies(Limit limit);
 
-    // API8: Lọc phim theo thể loại (JOIN qua bảng trung gian movie_genre)
-    @Query("SELECT m FROM Movie m JOIN m.genres g WHERE g.id = :genreId")
-    List<Movie> findByGenreId(@Param("genreId") Long genreId, Limit limit);
+    // API8: Lọc phim theo thể loại slug (JOIN qua bảng trung gian movie_genre)
+    @Query("SELECT m FROM Movie m JOIN m.genres g WHERE g.slug = :genreSlug")
+    List<Movie> findByGenreSlug(@Param("genreSlug") String genreSlug, Limit limit);
 
     // API12: Lọc phim đa điều kiện bằng Slug
     @Query("SELECT DISTINCT m FROM Movie m " +

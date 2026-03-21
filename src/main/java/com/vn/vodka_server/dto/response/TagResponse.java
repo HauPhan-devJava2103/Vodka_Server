@@ -16,4 +16,7 @@ public class TagResponse {
 
     // Tên của tag
     private String name;
+
+    // Slug dùng cho URL
+    private String slug;
 }

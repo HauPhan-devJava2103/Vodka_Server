@@ -52,6 +52,8 @@ public class WatchMovieResponse {
         private Integer releaseYear;
         private Double rating;
         private String posterUrl;
+        private String bannerUrl;
+        private String description;
         private List<GenreResponse> genre;
         private List<TagResponse> tags;
     }
@@ -63,5 +65,6 @@ public class WatchMovieResponse {
     public static class MovieStatsInfo {
         private Long totalViews;
         private Long totalReviews;
+        private Long favorites;
     }
 }
