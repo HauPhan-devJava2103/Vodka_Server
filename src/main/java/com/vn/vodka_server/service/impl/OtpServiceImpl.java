@@ -19,7 +19,7 @@ public class OtpServiceImpl implements OtpService {
     private final Map<String, ResetTokenData> resetTokenStorage = new ConcurrentHashMap<>();
 
     private static final int OTP_LENGTH = 6;
-    private static final int OTP_EXPIRY_SECONDS = 30;
+    private static final int OTP_EXPIRY_SECONDS = 600;
     private static final int RESET_TOKEN_EXPIRY_MINUTES = 10;
 
     private record OtpData(String otp, LocalDateTime createdAt) {
