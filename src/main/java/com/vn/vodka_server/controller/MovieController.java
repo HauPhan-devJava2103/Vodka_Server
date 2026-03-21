@@ -152,10 +152,11 @@ public class MovieController {
                 .pagination(meta)
                 .build());
     }
+
     // POST /api/movies/reviews — Tạo review gốc hoặc reply bình luận
     // Yêu cầu đăng nhập (JWT). Email lấy từ Principal do Spring Security inject
-    // replyToId == null  → tạo review gốc  → trả ReviewResponse
-    // replyToId != null  → tạo reply       → trả ReviewResponse.ReplyInfo
+    // replyToId == null -> tạo review gốc -> trả ReviewResponse
+    // replyToId != null -> tạo reply -> trả ReviewResponse.ReplyInfo
     @PostMapping("/reviews")
     public ResponseEntity<ApiResponse> createReview(
             @RequestBody @Valid CreateReviewRequest request,

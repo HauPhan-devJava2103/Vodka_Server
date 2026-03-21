@@ -49,6 +49,6 @@ public interface MovieService {
 
     // Tạo review mới hoặc reply bình luận
     // Nếu replyToId == null: tạo review gốc -> trả ReviewResponse
-    // Nếu replyToId != null: tạo reply      -> trả ReviewResponse.ReplyInfo
+    // Nếu replyToId != null: tạo reply -> trả ReviewResponse.ReplyInfo
     Object createReview(CreateReviewRequest request, String email);
 }

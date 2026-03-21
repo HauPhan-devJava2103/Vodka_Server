@@ -345,10 +345,13 @@ public class MovieServiceImpl implements MovieService {
                                                                 .map(reply -> ReviewResponse.ReplyInfo.builder()
                                                                                 .id(reply.getId())
                                                                                 .userName(reply.getUser().getFullName())
-                                                                                .avatarUrl(reply.getUser().getAvatarUrl())
+                                                                                .avatarUrl(reply.getUser()
+                                                                                                .getAvatarUrl())
                                                                                 .content(reply.getContent())
                                                                                 .createdAt(reply.getCreatedAt() != null
-                                                                                                ? reply.getCreatedAt().toInstant().toString()
+                                                                                                ? reply.getCreatedAt()
+                                                                                                                .toInstant()
+                                                                                                                .toString()
                                                                                                 : null)
                                                                                 .build())
                                                                 .toList())
@@ -408,8 +411,8 @@ public class MovieServiceImpl implements MovieService {
         }
 
         // Tạo review gốc hoặc reply bình luận
-        // Trường hợp 1: replyToId == null → tạo Review, trả ReviewResponse
-        // Trường hợp 2: replyToId != null → tạo ReviewReply, trả ReviewResponse.ReplyInfo
+        // TH 1: replyToId == null -> tạo Review, trả ReviewResponse
+        // TH 2: replyToId != null -> tạo ReviewReply, trả ReviewResponse.ReplyInfo
         @Override
         public Object createReview(CreateReviewRequest request, String email) {
 
@@ -424,7 +427,7 @@ public class MovieServiceImpl implements MovieService {
                                                 "Phim với id = " + request.getMovieId() + " không tồn tại"));
 
                 if (request.getReplyToId() == null) {
-                        // ─── Trường hợp 1: Tạo review gốc ───────────────────────────────────
+                        // TH 1: Tạo review gốc
                         if (request.getRating() == null)
                                 throw new BadRequestException("Rating không được để trống khi tạo đánh giá");
 
@@ -451,10 +454,11 @@ public class MovieServiceImpl implements MovieService {
                                         .build();
 
                 } else {
-                        // ─── Trường hợp 2: Tạo reply bình luận ──────────────────────────────
+                        // TH 2: Tạo reply bình luận
                         Review parentReview = reviewRepository.findById(request.getReplyToId())
                                         .orElseThrow(() -> new ResourceNotFoundException(
-                                                        "Review với id = " + request.getReplyToId() + " không tồn tại"));
+                                                        "Review với id = " + request.getReplyToId()
+                                                                        + " không tồn tại"));
 
                         // Tạo entity ReviewReply và lưu vào DB
                         ReviewReply reply = ReviewReply.builder()
