@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import com.vn.vodka_server.dto.request.CreateReviewRequest;
 import com.vn.vodka_server.dto.response.*;
 import com.vn.vodka_server.exception.BadRequestException;
 import com.vn.vodka_server.exception.ResourceNotFoundException;
@@ -23,6 +24,7 @@ public class MovieServiceImpl implements MovieService {
         private final MovieRepository movieRepository;
         private final SeasonRepository seasonRepository;
         private final ReviewRepository reviewRepository;
+        private final ReviewReplyRepository reviewReplyRepository;
         private final WatchHistoryRepository watchHistoryRepository;
         private final GenreRepository genreRepository;
         private final UserRepository userRepository;
@@ -41,13 +43,13 @@ public class MovieServiceImpl implements MovieService {
 
         // Lấy phim thịnh hành nhất (phim có lượt xem cao nhất)
         @Override
-        public List<TrendingMovieResponse> getTrendingMovies(int limit) {
+        public List<FeaturedMovieResponse> getTrendingMovies(int limit) {
                 if (limit <= 0)
                         throw new BadRequestException("Số lượng phim phải lớn hơn 0");
                 if (limit > 50)
                         throw new BadRequestException("Không thể lấy quá 50 phim một lần");
                 return movieRepository.findTrendingMovies(Limit.of(limit)).stream()
-                                .map(this::mapToTrendingMovieResponse)
+                                .map(this::mapToFeaturedMovieResponse)
                                 .toList();
         }
 
@@ -55,7 +57,7 @@ public class MovieServiceImpl implements MovieService {
         // Service chỉ trả về Page<DTO> thô, không đóng gói ApiResponse
         // Việc đóng gói ApiResponse + PaginationMeta sẽ do Controller làm
         @Override
-        public Page<TrendingMovieResponse> getNewReleases(int page, int limit) {
+        public Page<FeaturedMovieResponse> getNewReleases(int page, int limit) {
                 // Chặn dữ liệu rác ngay từ đầu
                 if (page < 1)
                         throw new BadRequestException("Số trang phải bắt đầu từ 1");
@@ -72,7 +74,7 @@ public class MovieServiceImpl implements MovieService {
                 // 3. Dùng .map() của Page để chuyển đổi Entity -> DTO
                 // Page.map() tự động giữ nguyên thông tin phân trang (totalItems,
                 // totalPages...)
-                return moviePage.map(this::mapToTrendingMovieResponse);
+                return moviePage.map(this::mapToFeaturedMovieResponse);
         }
 
         // Lấy chi tiết phim
@@ -134,7 +136,7 @@ public class MovieServiceImpl implements MovieService {
 
         // API5: Lấy lịch sử xem phim của user
         @Override
-        public List<TrendingMovieResponse> getWatchHistory(String email, int limit) {
+        public List<FeaturedMovieResponse> getWatchHistory(String email, int limit) {
 
                 User user = userRepository.findByEmail(email)
                                 .orElseThrow(() -> new RuntimeException(
@@ -146,13 +148,13 @@ public class MovieServiceImpl implements MovieService {
 
                 return histories.stream()
                                 .map(WatchHistory::getMovie)
-                                .map(this::mapToTrendingMovieResponse)
+                                .map(this::mapToFeaturedMovieResponse)
                                 .toList();
         }
 
         // API6: Lấy phim mới cập nhật gần đây, Sắp xếp theo trường updatedAt giảm dần
         @Override
-        public List<TrendingMovieResponse> getRecentlyUpdated(int limit) {
+        public List<FeaturedMovieResponse> getRecentlyUpdated(int limit) {
                 // Kiểm tra limit hợp lệ
                 if (limit <= 0)
                         throw new BadRequestException("Số lượng phim phải lớn hơn 0");
@@ -162,13 +164,13 @@ public class MovieServiceImpl implements MovieService {
                 // Lấy 8 phim mới cập nhật gần đây(fix cứng)
                 return movieRepository.findAllByOrderByUpdatedAtDesc(Limit.of(8))
                                 .stream()
-                                .map(this::mapToTrendingMovieResponse)
+                                .map(this::mapToFeaturedMovieResponse)
                                 .toList();
         }
 
         // API7: Lấy phim đánh giá cao nhất, Sắp xếp theo trường rating giảm dần
         @Override
-        public List<TrendingMovieResponse> getHighlyRatedMovies(int limit) {
+        public List<FeaturedMovieResponse> getHighlyRatedMovies(int limit) {
                 // Kiểm tra limit hợp lệ
                 if (limit <= 0)
                         throw new BadRequestException("Số lượng phim phải lớn hơn 0");
@@ -178,13 +180,13 @@ public class MovieServiceImpl implements MovieService {
                 // Lấy 10 phim có đánh giá cao nhất(fix cứng)
                 return movieRepository.findHighlyRatedMovies(Limit.of(10))
                                 .stream()
-                                .map(this::mapToTrendingMovieResponse)
+                                .map(this::mapToFeaturedMovieResponse)
                                 .toList();
         }
 
         // API8: Lọc phim theo thể loại
         @Override
-        public List<TrendingMovieResponse> getMoviesByGenre(Long genreId, int limit) {
+        public List<FeaturedMovieResponse> getMoviesByGenre(String genreSlug, int limit) {
                 // Kiểm tra limit hợp lệ
                 if (limit <= 0)
                         throw new BadRequestException("Số lượng phim phải lớn hơn 0");
@@ -192,13 +194,13 @@ public class MovieServiceImpl implements MovieService {
                         throw new BadRequestException("Không thể lấy quá 50 phim một lần");
 
                 // Kiểm tra thể loại có tồn tại trong DB không
-                if (!genreRepository.existsById(genreId))
-                        throw new ResourceNotFoundException("Thể loại với id = " + genreId + " không tồn tại");
+                if (!genreRepository.existsBySlug(genreSlug))
+                        throw new ResourceNotFoundException("Thể loại '" + genreSlug + "' không tồn tại");
 
                 // Lấy 20 phim theo thể loại(fix cứng)
-                return movieRepository.findByGenreId(genreId, Limit.of(20))
+                return movieRepository.findByGenreSlug(genreSlug, Limit.of(20))
                                 .stream()
-                                .map(this::mapToTrendingMovieResponse)
+                                .map(this::mapToFeaturedMovieResponse)
                                 .toList();
         }
 
@@ -253,13 +255,14 @@ public class MovieServiceImpl implements MovieService {
                                 .stats(WatchMovieResponse.MovieStatsInfo.builder()
                                                 .totalViews(movie.getViewCount())
                                                 .totalReviews(totalReviews)
+                                                .favorites(movie.getFavorites())
                                                 .build())
                                 .build();
         }
 
         // API12: Lọc phim đa điều kiện bằng Slug
         @Override
-        public Page<FilterMovieResponse> filterMovies(String keyword, String tagSlug,
+        public Page<FeaturedMovieResponse> filterMovies(String keyword, String tagSlug,
                         List<String> genreSlugs, int page, int pageSize) {
 
                 // 1. Validate phân trang
@@ -282,7 +285,7 @@ public class MovieServiceImpl implements MovieService {
                                 safeKeyword, safeTagSlug, safeGenreSlugs, pageable);
 
                 // 5. Map sang DTO
-                return moviePage.map(this::mapToFilterMovieResponse);
+                return moviePage.map(this::mapToFeaturedMovieResponse);
         }
 
         // HELPER
@@ -296,13 +299,10 @@ public class MovieServiceImpl implements MovieService {
                                 .releaseYear(movie.getReleaseYear())
                                 .rating(movie.getRating())
                                 .genre(movie.getGenres().stream()
-                                                .map(genre -> new GenreResponse(
-                                                                genre.getId(),
-                                                                genre.getName()))
+                                                .map(this::mapToGenreResponse)
                                                 .collect(Collectors.toList()))
                                 .tags(movie.getTags().stream()
-                                                .map(tag -> new TagResponse(tag.getId(),
-                                                                tag.getName()))
+                                                .map(this::mapToTagResponse)
                                                 .collect(Collectors.toList()))
                                 .description(movie.getDescription())
                                 .build();
@@ -340,28 +340,31 @@ public class MovieServiceImpl implements MovieService {
                                                 .createdAt(r.getCreatedAt() != null
                                                                 ? r.getCreatedAt().toInstant().toString()
                                                                 : null)
+                                                // Map danh sách replied
+                                                .replied(r.getReplies().stream()
+                                                                .map(reply -> ReviewResponse.ReplyInfo.builder()
+                                                                                .id(reply.getId())
+                                                                                .userName(reply.getUser().getFullName())
+                                                                                .avatarUrl(reply.getUser().getAvatarUrl())
+                                                                                .content(reply.getContent())
+                                                                                .createdAt(reply.getCreatedAt() != null
+                                                                                                ? reply.getCreatedAt().toInstant().toString()
+                                                                                                : null)
+                                                                                .build())
+                                                                .toList())
                                                 .build())
-
                                 .toList();
                 return response;
         }
 
-        // Mapper List<Movie> sang List<TrendingMovieResponse>
-        private TrendingMovieResponse mapToTrendingMovieResponse(Movie m) {
-                return TrendingMovieResponse.builder()
-                                .id(m.getId())
-                                .title(m.getTitle())
-                                .build();
-        }
-
         // Mapper Genre sang GenreResponse
         private GenreResponse mapToGenreResponse(Genre genre) {
-                return new GenreResponse(genre.getId(), genre.getName());
+                return new GenreResponse(genre.getId(), genre.getName(), genre.getSlug());
         }
 
         // Mapper Tag sang TagResponse
         private TagResponse mapToTagResponse(Tag tag) {
-                return new TagResponse(tag.getId(), tag.getName());
+                return new TagResponse(tag.getId(), tag.getName(), tag.getSlug());
         }
 
         // Mapper Movie sang FeaturedMovieResponse
@@ -391,6 +394,8 @@ public class MovieServiceImpl implements MovieService {
                                 .id(movie.getId())
                                 .title(movie.getTitle())
                                 .posterUrl(movie.getPostUrl())
+                                .bannerUrl(movie.getBannerUrl())
+                                .description(movie.getDescription())
                                 .releaseYear(movie.getReleaseYear())
                                 .rating(movie.getRating())
                                 .genre(movie.getGenres().stream()
@@ -402,33 +407,74 @@ public class MovieServiceImpl implements MovieService {
                                 .build();
         }
 
-        // API12 Filter: Mapper Movie sang FilterMovieResponse
-        private FilterMovieResponse mapToFilterMovieResponse(Movie movie) {
-                // Lấy thời lượng từ tập 1 của phần 1
-                Double firstEpisodeDuration = null;
-                if (movie.getSeasons() != null && !movie.getSeasons().isEmpty()) {
-                        Season firstSeason = movie.getSeasons().get(0);
-                        if (firstSeason.getEpisodes() != null && !firstSeason.getEpisodes().isEmpty()) {
-                                firstEpisodeDuration = firstSeason.getEpisodes().get(0).getDuration();
-                        }
-                }
+        // Tạo review gốc hoặc reply bình luận
+        // Trường hợp 1: replyToId == null → tạo Review, trả ReviewResponse
+        // Trường hợp 2: replyToId != null → tạo ReviewReply, trả ReviewResponse.ReplyInfo
+        @Override
+        public Object createReview(CreateReviewRequest request, String email) {
 
-                return FilterMovieResponse.builder()
-                                .id(movie.getId())
-                                .title(movie.getTitle())
-                                .posterUrl(movie.getPostUrl())
-                                .releaseYear(movie.getReleaseYear() != null ? movie.getReleaseYear() : 0)
-                                .rating(movie.getRating() != null ? movie.getRating() : 0.0)
-                                // Trả về Integer
-                                .duration(firstEpisodeDuration != null ? firstEpisodeDuration.intValue() : null)
-                                // Trả về slug làm id cho Genre
-                                .genre(movie.getGenres().stream()
-                                                .map(g -> new FilterMovieResponse.GenreInfo(g.getSlug(), g.getName()))
-                                                .toList())
-                                // Trả về slug làm id cho Tag
-                                .tags(movie.getTags().stream()
-                                                .map(t -> new FilterMovieResponse.TagInfo(t.getSlug(), t.getName()))
-                                                .toList())
-                                .build();
+                // Lấy thông tin người dùng hiện tại từ email (JWT)
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Không tìm thấy tài khoản với email: " + email));
+
+                // Kiểm tra phim tồn tại hay không
+                Movie movie = movieRepository.findById(request.getMovieId())
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Phim với id = " + request.getMovieId() + " không tồn tại"));
+
+                if (request.getReplyToId() == null) {
+                        // ─── Trường hợp 1: Tạo review gốc ───────────────────────────────────
+                        if (request.getRating() == null)
+                                throw new BadRequestException("Rating không được để trống khi tạo đánh giá");
+
+                        // Tạo entity Review và lưu vào DB
+                        Review review = Review.builder()
+                                        .content(request.getContent())
+                                        .rating(request.getRating().doubleValue())
+                                        .movie(movie)
+                                        .user(user)
+                                        .build();
+                        review = reviewRepository.save(review);
+
+                        // Trả về ReviewResponse với replied rỗng
+                        return ReviewResponse.builder()
+                                        .id(review.getId())
+                                        .userName(user.getFullName())
+                                        .avatarUrl(user.getAvatarUrl())
+                                        .rating(review.getRating())
+                                        .content(review.getContent())
+                                        .createdAt(review.getCreatedAt() != null
+                                                        ? review.getCreatedAt().toInstant().toString()
+                                                        : null)
+                                        .replied(java.util.Collections.emptyList())
+                                        .build();
+
+                } else {
+                        // ─── Trường hợp 2: Tạo reply bình luận ──────────────────────────────
+                        Review parentReview = reviewRepository.findById(request.getReplyToId())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Review với id = " + request.getReplyToId() + " không tồn tại"));
+
+                        // Tạo entity ReviewReply và lưu vào DB
+                        ReviewReply reply = ReviewReply.builder()
+                                        .content(request.getContent())
+                                        .review(parentReview)
+                                        .user(user)
+                                        .build();
+                        reply = reviewReplyRepository.save(reply);
+
+                        // Trả về ReplyInfo (không có rating, không có replied)
+                        return ReviewResponse.ReplyInfo.builder()
+                                        .id(reply.getId())
+                                        .userName(user.getFullName())
+                                        .avatarUrl(user.getAvatarUrl())
+                                        .content(reply.getContent())
+                                        .createdAt(reply.getCreatedAt() != null
+                                                        ? reply.getCreatedAt().toInstant().toString()
+                                                        : null)
+                                        .build();
+                }
         }
+
 }

@@ -24,6 +24,7 @@ public class GenreServiceImpl implements GenreService {
                 .map(genre -> GenreResponse.builder() // Mỗi đối tượng đi qua sẽ được biến đổi thành GenreResponse
                         .id(genre.getId()) // dùng builder tiện và sạch hơn tạo contructor
                         .name(genre.getName())
+                        .slug(genre.getSlug())
                         .build())
                 .toList(); // Trả về danh sách GenreResponse
     }

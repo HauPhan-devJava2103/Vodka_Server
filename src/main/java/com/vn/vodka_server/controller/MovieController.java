@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vn.vodka_server.dto.response.ApiResponse;
 import com.vn.vodka_server.dto.response.PaginationMeta;
-import com.vn.vodka_server.dto.response.TrendingMovieResponse;
+import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
 import com.vn.vodka_server.service.MovieService;
 import com.vn.vodka_server.util.PaginationUtils;
 
@@ -16,9 +16,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import com.vn.vodka_server.dto.response.FilterMovieResponse;
 
+import jakarta.validation.Valid;
+
+import com.vn.vodka_server.dto.request.CreateReviewRequest;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -41,7 +46,7 @@ public class MovieController {
             @RequestParam(defaultValue = "10") int limit) {
 
         // 1. Nhận Page thô từ Service
-        Page<TrendingMovieResponse> resultPage = movieService.getNewReleases(page, limit);
+        Page<FeaturedMovieResponse> resultPage = movieService.getNewReleases(page, limit);
 
         // 2. Controller đóng gói metadata phân trang
         PaginationMeta meta = PaginationUtils.buildPaginationMeta(resultPage, page);
@@ -88,12 +93,12 @@ public class MovieController {
     }
 
     // API8: Lọc phim theo thể loại
-    @GetMapping("/genre/{genreId}")
+    @GetMapping("/genre/{genreName}")
     public ResponseEntity<ApiResponse> getMoviesByGenre(
-            @PathVariable Long genreId,
+            @PathVariable String genreName,
             @RequestParam(defaultValue = "20") int limit) {
-        return ResponseEntity.ok(ApiResponse.success("Success",
-                movieService.getMoviesByGenre(genreId, limit)));
+        return ResponseEntity.ok(ApiResponse.success("Lấy phim theo thể loại thành công",
+                movieService.getMoviesByGenre(genreName, limit)));
     }
 
     // API9: Lấy chi tiết phim
@@ -135,7 +140,7 @@ public class MovieController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "30") int pageSize) {
 
-        Page<FilterMovieResponse> resultPage = movieService.filterMovies(
+        Page<FeaturedMovieResponse> resultPage = movieService.filterMovies(
                 keyword, tag, genres, page, pageSize);
 
         PaginationMeta meta = PaginationUtils.buildPaginationMeta(resultPage, page);
@@ -146,5 +151,22 @@ public class MovieController {
                 .data(resultPage.getContent())
                 .pagination(meta)
                 .build());
+    }
+    // POST /api/movies/reviews — Tạo review gốc hoặc reply bình luận
+    // Yêu cầu đăng nhập (JWT). Email lấy từ Principal do Spring Security inject
+    // replyToId == null  → tạo review gốc  → trả ReviewResponse
+    // replyToId != null  → tạo reply       → trả ReviewResponse.ReplyInfo
+    @PostMapping("/reviews")
+    public ResponseEntity<ApiResponse> createReview(
+            @RequestBody @Valid CreateReviewRequest request,
+            Principal principal) {
+        Object result = movieService.createReview(request, principal.getName());
+
+        // Xác định message theo loại (review gốc hay reply)
+        String message = request.getReplyToId() == null
+                ? "Thêm đánh giá thành công"
+                : "Phản hồi bình luận thành công";
+
+        return ResponseEntity.ok(ApiResponse.success(message, result));
     }
 }
