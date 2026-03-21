@@ -299,13 +299,10 @@ public class MovieServiceImpl implements MovieService {
                                 .releaseYear(movie.getReleaseYear())
                                 .rating(movie.getRating())
                                 .genre(movie.getGenres().stream()
-                                                .map(genre -> new GenreResponse(
-                                                                String.valueOf(genre.getId()),
-                                                                genre.getName()))
+                                                .map(this::mapToGenreResponse)
                                                 .collect(Collectors.toList()))
                                 .tags(movie.getTags().stream()
-                                                .map(tag -> new TagResponse(String.valueOf(tag.getId()),
-                                                                tag.getName()))
+                                                .map(this::mapToTagResponse)
                                                 .collect(Collectors.toList()))
                                 .description(movie.getDescription())
                                 .build();
@@ -359,12 +356,20 @@ public class MovieServiceImpl implements MovieService {
 
         // Mapper Genre sang GenreResponse
         private GenreResponse mapToGenreResponse(Genre genre) {
-                return new GenreResponse(String.valueOf(genre.getId()), genre.getName());
+                return GenreResponse.builder()
+                                .id(String.valueOf(genre.getId()))
+                                .name(genre.getName())
+                                .slug(genre.getSlug())
+                                .build();
         }
 
         // Mapper Tag sang TagResponse
         private TagResponse mapToTagResponse(Tag tag) {
-                return new TagResponse(String.valueOf(tag.getId()), tag.getName());
+                return TagResponse.builder()
+                                .id(String.valueOf(tag.getId()))
+                                .name(tag.getName())
+                                .slug(tag.getSlug())
+                                .build();
         }
 
         // Mapper Movie sang FeaturedMovieResponse

@@ -16,4 +16,6 @@ public class GenreResponse {
 
     // Tên của thể loại
     private String name;
+
+    private String slug;
 }
