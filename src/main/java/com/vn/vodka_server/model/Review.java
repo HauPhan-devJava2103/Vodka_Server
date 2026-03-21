@@ -39,4 +39,8 @@ public class Review extends AbstractEntity {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
+
+    @Column(name = "reply_to_id")
+    private String replyToId;
+
 }

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeasonResponse {
-    private String id;
+    private Long id;
     private String title;
     private String thumbnailUrl;
     private List<EpisodeResponse> episodes;

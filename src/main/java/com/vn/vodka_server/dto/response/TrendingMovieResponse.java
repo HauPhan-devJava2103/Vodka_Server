@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TrendingMovieResponse {
     // ID của phim
-    private String id;
+    private Long id;
     // tên phim
     private String title;
 }

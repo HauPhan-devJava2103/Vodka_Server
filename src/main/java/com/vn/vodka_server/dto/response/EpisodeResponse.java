@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EpisodeResponse {
-    private String id;
+    private Long id;
     private String title;
     private Double duration;
 }

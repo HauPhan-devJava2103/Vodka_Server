@@ -235,11 +235,11 @@ public class MovieServiceImpl implements MovieService {
                 // Bước 7: Đóng gói dữ liệu trả về DTO
                 return WatchMovieResponse.builder()
                                 .movie(WatchMovieResponse.MovieInfo.builder()
-                                                .id(String.valueOf(movie.getId()))
+                                                .id(movie.getId())
                                                 .title(movie.getTitle())
                                                 .build())
                                 .currentEpisode(WatchMovieResponse.CurrentEpisodeInfo.builder()
-                                                .id(String.valueOf(episode.getId()))
+                                                .id(episode.getId())
                                                 .title(episode.getTitle())
                                                 .duration(episode.getDuration())
                                                 .videoUrl(episode.getVideoUrl())
@@ -289,7 +289,7 @@ public class MovieServiceImpl implements MovieService {
         // Mapper Movie sang FeaturedMovieResponse
         private FeaturedMovieResponse mapMovieToFeaturedMovieResponse(Movie movie) {
                 return FeaturedMovieResponse.builder()
-                                .id(movie.getId().toString())
+                                .id(movie.getId())
                                 .title(movie.getTitle())
                                 .posterUrl(movie.getPostUrl())
                                 .bannerUrl(movie.getBannerUrl())
@@ -297,11 +297,11 @@ public class MovieServiceImpl implements MovieService {
                                 .rating(movie.getRating())
                                 .genre(movie.getGenres().stream()
                                                 .map(genre -> new GenreResponse(
-                                                                String.valueOf(genre.getId()),
+                                                                genre.getId(),
                                                                 genre.getName()))
                                                 .collect(Collectors.toList()))
                                 .tags(movie.getTags().stream()
-                                                .map(tag -> new TagResponse(String.valueOf(tag.getId()),
+                                                .map(tag -> new TagResponse(tag.getId(),
                                                                 tag.getName()))
                                                 .collect(Collectors.toList()))
                                 .description(movie.getDescription())
@@ -312,12 +312,12 @@ public class MovieServiceImpl implements MovieService {
         private List<SeasonResponse> mapSeasonToSeasonResponse(List<Season> seasons) {
                 List<SeasonResponse> response = seasons.stream()
                                 .map(s -> SeasonResponse.builder()
-                                                .id(String.valueOf(s.getId()))
+                                                .id(s.getId())
                                                 .title(s.getTitle())
                                                 .thumbnailUrl(s.getThumbnailUrl())
                                                 .episodes(s.getEpisodes().stream()
                                                                 .map(e -> EpisodeResponse.builder()
-                                                                                .id(String.valueOf(e.getId()))
+                                                                                .id(e.getId())
                                                                                 .title(e.getTitle())
                                                                                 .duration(e.getDuration())
                                                                                 .build())
@@ -331,7 +331,7 @@ public class MovieServiceImpl implements MovieService {
         private List<ReviewResponse> mapReviewToReviewResponse(List<Review> reviews) {
                 List<ReviewResponse> response = reviews.stream()
                                 .map(r -> ReviewResponse.builder()
-                                                .id(String.valueOf(r.getId()))
+                                                .id(r.getId())
                                                 .userName(r.getUser().getFullName())
                                                 .avatarUrl(r.getUser().getAvatarUrl())
                                                 .rating(r.getRating())
@@ -349,25 +349,25 @@ public class MovieServiceImpl implements MovieService {
         // Mapper List<Movie> sang List<TrendingMovieResponse>
         private TrendingMovieResponse mapToTrendingMovieResponse(Movie m) {
                 return TrendingMovieResponse.builder()
-                                .id(String.valueOf(m.getId()))
+                                .id(m.getId())
                                 .title(m.getTitle())
                                 .build();
         }
 
         // Mapper Genre sang GenreResponse
         private GenreResponse mapToGenreResponse(Genre genre) {
-                return new GenreResponse(String.valueOf(genre.getId()), genre.getName());
+                return new GenreResponse(genre.getId(), genre.getName());
         }
 
         // Mapper Tag sang TagResponse
         private TagResponse mapToTagResponse(Tag tag) {
-                return new TagResponse(String.valueOf(tag.getId()), tag.getName());
+                return new TagResponse(tag.getId(), tag.getName());
         }
 
         // Mapper Movie sang FeaturedMovieResponse
         private FeaturedMovieResponse mapToFeaturedMovieResponse(Movie movie) {
                 return FeaturedMovieResponse.builder()
-                                .id(String.valueOf(movie.getId()))
+                                .id(movie.getId())
                                 .title(movie.getTitle())
                                 .posterUrl(movie.getPostUrl())
                                 .bannerUrl(movie.getBannerUrl())
@@ -388,7 +388,7 @@ public class MovieServiceImpl implements MovieService {
         // API11: Mapper Movie sang RelatedMovieInfo
         private WatchMovieResponse.RelatedMovieInfo mapToRelatedMovieInfo(Movie movie) {
                 return WatchMovieResponse.RelatedMovieInfo.builder()
-                                .id(String.valueOf(movie.getId()))
+                                .id(movie.getId())
                                 .title(movie.getTitle())
                                 .posterUrl(movie.getPostUrl())
                                 .releaseYear(movie.getReleaseYear())
@@ -414,7 +414,7 @@ public class MovieServiceImpl implements MovieService {
                 }
 
                 return FilterMovieResponse.builder()
-                                .id(String.valueOf(movie.getId()))
+                                .id(movie.getId())
                                 .title(movie.getTitle())
                                 .posterUrl(movie.getPostUrl())
                                 .releaseYear(movie.getReleaseYear() != null ? movie.getReleaseYear() : 0)

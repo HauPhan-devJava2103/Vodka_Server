@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GenreResponse {
     // ID của thể loại
-    private String id;
+    private Long id;
 
     // Tên của thể loại
     private String name;
