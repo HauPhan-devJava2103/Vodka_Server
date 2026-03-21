@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.vn.vodka_server.util.EGender;
+import com.vn.vodka_server.util.EProvider;
 import com.vn.vodka_server.util.ERole;
 import com.vn.vodka_server.util.EStatus;
 
@@ -65,5 +66,8 @@ public class User extends AbstractEntity {
     // User - Media (danh sách media user đã upload)
     @OneToMany(mappedBy = "uploadedBy")
     private List<Media> medias = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    private EProvider provider;
 
 }

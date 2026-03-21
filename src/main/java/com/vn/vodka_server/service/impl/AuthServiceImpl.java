@@ -1,12 +1,19 @@
 package com.vn.vodka_server.service.impl;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.vn.vodka_server.dto.request.LoginGoogleRequest;
 import com.vn.vodka_server.dto.request.LoginRequest;
 import com.vn.vodka_server.dto.request.RegisterRequest;
 import com.vn.vodka_server.dto.request.ResetPasswordRequest;
@@ -19,6 +26,7 @@ import com.vn.vodka_server.repository.UserRepository;
 import com.vn.vodka_server.service.AuthService;
 import com.vn.vodka_server.service.EmailService;
 import com.vn.vodka_server.service.OtpService;
+import com.vn.vodka_server.util.EProvider;
 import com.vn.vodka_server.util.ERole;
 import com.vn.vodka_server.util.EStatus;
 import com.vn.vodka_server.util.JwtUtils;
@@ -36,6 +44,9 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
 
     private final String IMAGE_DEFAULT = "https://res.cloudinary.com/dcrxiky8s/image/upload/v1773409663/avatardefault.png";
+    // Google client ID
+    @Value("${google.client-id}")
+    private String googleClientId;
 
     @Override
     public void sendOtp(SendOtpRequest request) {
@@ -81,7 +92,8 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtils.generateToken(userDetails);
 
         // 7. Trả về response giống login
-        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl());
+        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl(),
+                "LOCAL");
         return new LoginResponse(token, userInfo);
     }
 
@@ -94,12 +106,9 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid password");
         }
         // 3. Tạo JWT token
-        UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole().name())
-                .build();
-        String token = jwtUtils.generateToken(userDetails);
-        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl());
+        String token = jwtUtils.generateToken(buildUserDetails(user));
+        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl(),
+                "LOCAL");
         return new LoginResponse(token, userInfo);
 
     }
@@ -151,6 +160,54 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
     }
 
+    @Override
+    public LoginResponse googleLogin(LoginGoogleRequest request) {
+        try {
+            // 1. Verify idToken với Google
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
+                    GsonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(request.getIdToken());
+            if (idToken == null) {
+                throw new RuntimeException("Google token không hợp lệ");
+            }
+
+            // 2. Lấy thông tin từ payload
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+            String picture = (String) payload.get("picture");
+
+            // 3. Tìm hoặc tạo user
+            User user = userRepository.findByEmail(email)
+                    .orElseGet(() -> {
+                        User newUser = User.builder()
+                                .email(email)
+                                .fullName(name)
+                                .avatarUrl(picture)
+                                .provider(EProvider.GOOGLE)
+                                .role(ERole.USER)
+                                .status(EStatus.ACTIVE)
+                                .build();
+                        return userRepository.save(newUser);
+                    });
+
+            // 4. Tạo JWT của hệ thống
+            String token = jwtUtils.generateToken(buildUserDetails(user));
+
+            // 5. Trả về response
+            UserInfo userInfo = new UserInfo(
+                    user.getId(), user.getEmail(), user.getFullName(),
+                    user.getAvatarUrl(), "GOOGLE");
+            return new LoginResponse(token, userInfo);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Xác thực Google thất bại: " + e.getMessage());
+        }
+    }
+
     // HELPER
     private void requireEmailExist(String email) {
         if (!userRepository.existsByEmail(email)) {
@@ -174,5 +231,13 @@ public class AuthServiceImpl implements AuthService {
         if (!otpService.validateOtp(email, otp)) {
             throw new RuntimeException("OTP không hợp lệ hoặc đã hết hạn");
         }
+    }
+
+    private UserDetails buildUserDetails(User user) {
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail())
+                .password(user.getPassword() != null ? user.getPassword() : "")
+                .roles(user.getRole().name())
+                .build();
     }
 }

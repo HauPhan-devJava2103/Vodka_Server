@@ -22,7 +22,7 @@ public class GenreServiceImpl implements GenreService {
         // GenreResponse
         return genreRepository.findAll().stream()
                 .map(genre -> GenreResponse.builder() // Mỗi đối tượng đi qua sẽ được biến đổi thành GenreResponse
-                        .id(String.valueOf(genre.getId())) // dùng builder tiện và sạch hơn tạo contructor
+                        .id(genre.getId()) // dùng builder tiện và sạch hơn tạo contructor
                         .name(genre.getName())
                         .build())
                 .toList(); // Trả về danh sách GenreResponse

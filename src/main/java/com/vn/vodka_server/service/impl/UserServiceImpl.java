@@ -44,6 +44,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        return new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl());
+        return new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl(), "LOCAL");
     }
 }

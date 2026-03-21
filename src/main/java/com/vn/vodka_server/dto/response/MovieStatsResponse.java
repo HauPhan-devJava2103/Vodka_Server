@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class TrendingMovieResponse {
-    // ID của phim
-    private Long id;
-    // tên phim
-    private String title;
+@NoArgsConstructor
+public class MovieStatsResponse {
+    private Long totalReviews;
+    private Long totalViews;
+    private Long favorites;
 }

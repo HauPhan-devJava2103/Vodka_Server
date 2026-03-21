@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vn.vodka_server.dto.request.LoginGoogleRequest;
 import com.vn.vodka_server.dto.request.LoginRequest;
 import com.vn.vodka_server.dto.request.RegisterRequest;
 import com.vn.vodka_server.dto.request.ResetPasswordRequest;
@@ -81,6 +82,16 @@ public class Authentication {
         try {
             authServiceImpl.resetPassword(resetPasswordRequest);
             return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công", null));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<ApiResponse> googleLogin(@Valid @RequestBody LoginGoogleRequest request) {
+        try {
+            LoginResponse response = authServiceImpl.googleLogin(request);
+            return ResponseEntity.ok(ApiResponse.success("Xác thực Google thành công", response));
         } catch (Exception e) {
             return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
         }

@@ -1,14 +1,22 @@
 package com.vn.vodka_server.controller;
 
+import java.security.Principal;
+
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vn.vodka_server.dto.response.ApiResponse;
+import com.vn.vodka_server.dto.response.PaginationMeta;
+import com.vn.vodka_server.dto.response.TrendingMovieResponse;
 import com.vn.vodka_server.service.MovieService;
+import com.vn.vodka_server.util.PaginationUtils;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import com.vn.vodka_server.dto.response.FilterMovieResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,17 +27,124 @@ public class MovieController {
 
     private final MovieService movieService;
 
-    // Lấy danh sách phim nổi bật
+    // API1: Lấy danh sách phim nổi bật
     @GetMapping("/featured")
     public ResponseEntity<ApiResponse> getFeaturedMovies() {
         return ResponseEntity.ok(ApiResponse.success("Success",
                 movieService.getFeaturedMovies()));
     }
 
-    // Lấy danh sách phim thịnh hành
+    // API3: Tìm phim hot (nhiều view nhất) có phân trang
+    @GetMapping("/new-releases")
+    public ResponseEntity<ApiResponse> getNewReleases(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+
+        // 1. Nhận Page thô từ Service
+        Page<TrendingMovieResponse> resultPage = movieService.getNewReleases(page, limit);
+
+        // 2. Controller đóng gói metadata phân trang
+        PaginationMeta meta = PaginationUtils.buildPaginationMeta(resultPage, page);
+
+        // 3. Trả về ApiResponse thống nhất
+        return ResponseEntity.ok(ApiResponse.builder()
+                .success(true)
+                .message("Success")
+                .data(resultPage.getContent())
+                .pagination(meta)
+                .build());
+    }
+
+    // API4: Lấy danh sách phim thịnh hành
     @GetMapping("/trending")
     public ResponseEntity<ApiResponse> getTrendingMovies(@RequestParam(defaultValue = "10") int limit) {
         return ResponseEntity.ok(ApiResponse.success("Success",
                 movieService.getTrendingMovies(limit)));
+    }
+
+    // API5: Lấy lịch sử xem phim của user
+    @GetMapping("/history")
+    public ResponseEntity<ApiResponse> getWatchHistory(
+            Principal principal,
+            @RequestParam(defaultValue = "5") int limit) {
+        return ResponseEntity.ok(ApiResponse.success("Success",
+                movieService.getWatchHistory(principal.getName(), limit)));
+    }
+
+    // API6: Lấy phim mới cập nhật gần đây
+    @GetMapping("/recently-updated")
+    public ResponseEntity<ApiResponse> getRecentlyUpdated(
+            @RequestParam(defaultValue = "8") int limit) {
+        return ResponseEntity.ok(ApiResponse.success("Success",
+                movieService.getRecentlyUpdated(limit)));
+    }
+
+    // API7: Lấy phim đánh giá cao nhất
+    @GetMapping("/highly-rated")
+    public ResponseEntity<ApiResponse> getHighlyRatedMovies(
+            @RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(ApiResponse.success("Success",
+                movieService.getHighlyRatedMovies(limit)));
+    }
+
+    // API8: Lọc phim theo thể loại
+    @GetMapping("/genre/{genreId}")
+    public ResponseEntity<ApiResponse> getMoviesByGenre(
+            @PathVariable Long genreId,
+            @RequestParam(defaultValue = "20") int limit) {
+        return ResponseEntity.ok(ApiResponse.success("Success",
+                movieService.getMoviesByGenre(genreId, limit)));
+    }
+
+    // API9: Lấy chi tiết phim
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getMovieById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết phim thành công",
+                    movieService.getMovieById(id)));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    // API10: Lấy danh sách đánh giá
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<ApiResponse> getReviews(@PathVariable Long id, @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int limit) {
+        try {
+            return ResponseEntity.ok(movieService.getReviews(id, page, limit));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    // API11: Lấy dữ liệu xem phim theo episodeId
+    @GetMapping("/watch/{episodeId}")
+    public ResponseEntity<ApiResponse> getWatchData(@PathVariable Long episodeId) {
+        return ResponseEntity.ok(ApiResponse.success("Lấy dữ liệu xem phim thành công",
+                movieService.getWatchData(episodeId)));
+
+    }
+
+    // API12: Lọc phim đa điều kiện bằng Slug
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponse> filterMovies(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String tag,
+            @RequestParam(required = false) java.util.List<String> genres,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "30") int pageSize) {
+
+        Page<FilterMovieResponse> resultPage = movieService.filterMovies(
+                keyword, tag, genres, page, pageSize);
+
+        PaginationMeta meta = PaginationUtils.buildPaginationMeta(resultPage, page);
+
+        return ResponseEntity.ok(ApiResponse.builder()
+                .success(true)
+                .message("Lấy danh sách phim thành công")
+                .data(resultPage.getContent())
+                .pagination(meta)
+                .build());
     }
 }

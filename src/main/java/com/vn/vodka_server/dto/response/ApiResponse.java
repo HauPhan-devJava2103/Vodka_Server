@@ -1,11 +1,14 @@
 package com.vn.vodka_server.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiResponse {
@@ -14,7 +17,7 @@ public class ApiResponse {
     private Object data;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private PaginationMeta pagination;
+    private PaginationMeta pagination; // Thêm trường mới để làm API có phân trang
 
     // Constructor không có pagination
     public ApiResponse(boolean success, String message, Object data) {

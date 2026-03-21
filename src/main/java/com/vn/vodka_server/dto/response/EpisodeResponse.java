@@ -5,15 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// DTO phản hồi chứa thông tin cơ bản của thể loại phim.
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class GenreResponse {
-    // ID của thể loại
+@NoArgsConstructor
+public class EpisodeResponse {
     private Long id;
-
-    // Tên của thể loại
-    private String name;
+    private String title;
+    private Double duration;
 }

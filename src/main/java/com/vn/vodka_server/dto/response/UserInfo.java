@@ -10,4 +10,5 @@ public class UserInfo {
     private String email;
     private String name;
     private String avatarUrl;
+    private String provider;
 }
