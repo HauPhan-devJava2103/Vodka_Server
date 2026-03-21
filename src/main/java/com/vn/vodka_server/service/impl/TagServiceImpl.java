@@ -18,7 +18,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<TagResponse> getAllTags() {
-        return tagRepository.findAllByOrderByNameAsc().stream()
+        return tagRepository.findAllByVisibleTrueOrderByNameAsc().stream()
                 .map(tag -> TagResponse.builder()
                         .id(String.valueOf(tag.getId()))
                         .name(tag.getName())

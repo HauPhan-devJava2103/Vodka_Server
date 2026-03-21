@@ -30,6 +30,11 @@ public class Tag extends AbstractEntity {
     @Column(name = "slug", unique = true)
     private String slug;
 
+    @Builder.Default
+    @Column(name = "visible")
+    private Boolean visible = Boolean.FALSE;
+
+
     // Relation Ship
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore // Chặn lỗi vòng lặp JSON

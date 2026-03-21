@@ -7,5 +7,5 @@ import com.vn.vodka_server.model.Tag;
 
 @Repository
 public interface  TagRepository extends JpaRepository<Tag, Long> {
-    java.util.List<Tag> findAllByOrderByNameAsc();
+    java.util.List<Tag> findAllByVisibleTrueOrderByNameAsc();
 }
