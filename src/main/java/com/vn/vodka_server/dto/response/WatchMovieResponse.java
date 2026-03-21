@@ -26,7 +26,7 @@ public class WatchMovieResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class MovieInfo {
-        private String id;
+        private Long id;
         private String title;
     }
 
@@ -35,7 +35,7 @@ public class WatchMovieResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CurrentEpisodeInfo {
-        private String id;
+        private Long id;
         private String title;
         private Double duration;
         private String videoUrl;
@@ -47,7 +47,7 @@ public class WatchMovieResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class RelatedMovieInfo {
-        private String id;
+        private Long id;
         private String title;
         private Integer releaseYear;
         private Double rating;

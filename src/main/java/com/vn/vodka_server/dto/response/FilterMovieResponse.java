@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FilterMovieResponse {
     // ID của phim
-    private String id;
+    private Long id;
 
     // Tên phim
     private String title;

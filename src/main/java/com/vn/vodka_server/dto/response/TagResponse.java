@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TagResponse {
     // ID của tag
-    private String id;
+    private Long id;
 
     // Tên của tag
     private String name;
