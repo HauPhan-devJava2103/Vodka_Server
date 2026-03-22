@@ -92,8 +92,13 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtils.generateToken(userDetails);
 
         // 7. Trả về response giống login
-        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl(),
-                "LOCAL");
+        UserInfo userInfo = UserInfo.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .avatarUrl(user.getAvatarUrl())
+                .provider("LOCAL")
+                .build();
         return new LoginResponse(token, userInfo);
     }
 
@@ -107,8 +112,13 @@ public class AuthServiceImpl implements AuthService {
         }
         // 3. Tạo JWT token
         String token = jwtUtils.generateToken(buildUserDetails(user));
-        UserInfo userInfo = new UserInfo(user.getId(), user.getEmail(), user.getFullName(), user.getAvatarUrl(),
-                "LOCAL");
+        UserInfo userInfo = UserInfo.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .avatarUrl(user.getAvatarUrl())
+                .provider("LOCAL")
+                .build();
         return new LoginResponse(token, userInfo);
 
     }
@@ -198,9 +208,13 @@ public class AuthServiceImpl implements AuthService {
             String token = jwtUtils.generateToken(buildUserDetails(user));
 
             // 5. Trả về response
-            UserInfo userInfo = new UserInfo(
-                    user.getId(), user.getEmail(), user.getFullName(),
-                    user.getAvatarUrl(), "GOOGLE");
+            UserInfo userInfo = UserInfo.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .fullName(user.getFullName())
+                    .avatarUrl(user.getAvatarUrl())
+                    .provider("GOOGLE")
+                    .build();
             return new LoginResponse(token, userInfo);
 
         } catch (Exception e) {
