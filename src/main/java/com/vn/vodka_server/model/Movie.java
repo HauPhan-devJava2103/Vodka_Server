@@ -80,5 +80,9 @@ public class Movie extends AbstractEntity {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
-}
 
+    // Movie - Favorite (danh sách user đã yêu thích phim này)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Favorite> favoriteList = new HashSet<>();
+}

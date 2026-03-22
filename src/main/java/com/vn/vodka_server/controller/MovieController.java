@@ -1,29 +1,27 @@
 package com.vn.vodka_server.controller;
 
 import java.security.Principal;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.vn.vodka_server.dto.response.ApiResponse;
-import com.vn.vodka_server.dto.response.PaginationMeta;
-import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
-import com.vn.vodka_server.service.MovieService;
-import com.vn.vodka_server.util.PaginationUtils;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import jakarta.validation.Valid;
-
-import com.vn.vodka_server.dto.request.CreateReviewRequest;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vn.vodka_server.dto.request.CreateReviewRequest;
+import com.vn.vodka_server.dto.response.ApiResponse;
+import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
+import com.vn.vodka_server.dto.response.PaginationMeta;
+import com.vn.vodka_server.service.MovieService;
+import com.vn.vodka_server.util.PaginationUtils;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -170,4 +168,22 @@ public class MovieController {
 
         return ResponseEntity.ok(ApiResponse.success(message, result));
     }
+
+    // Thêm xóa Phim yêu thích
+    @PostMapping("/{id}/favorite")
+    public ResponseEntity<ApiResponse> toggleFavorite(
+            @PathVariable Long id,
+            Principal principal) {
+        try {
+            boolean isFavorited = movieService.toggleFavorite(id, principal.getName());
+            return ResponseEntity
+                    .ok(ApiResponse.success("Cập nhật danh sách yêu thích thành công",
+                            Map.of("isFavorited", isFavorited)));
+
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+
+    }
+
 }

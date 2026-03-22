@@ -2,13 +2,17 @@ package com.vn.vodka_server.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vn.vodka_server.util.EGender;
 import com.vn.vodka_server.util.EProvider;
 import com.vn.vodka_server.util.ERole;
 import com.vn.vodka_server.util.EStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -66,6 +70,12 @@ public class User extends AbstractEntity {
     // User - Media (danh sách media user đã upload)
     @OneToMany(mappedBy = "uploadedBy")
     private List<Media> medias = new ArrayList<>();
+
+    // User - Favorite (danh sách phim yêu thích)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Favorite> favorites = new HashSet<>();
+
     @Enumerated(EnumType.STRING)
     @Column(name = "provider")
     private EProvider provider;

@@ -67,4 +67,5 @@ public class WatchMovieResponse {
         private Long totalReviews;
         private Long favorites;
     }
+
 }

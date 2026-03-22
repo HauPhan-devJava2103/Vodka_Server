@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.vn.vodka_server.model.Review;
+import com.vn.vodka_server.model.User;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
@@ -20,5 +21,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // Lấy danh sách đánh giá theo movie id
     Page<Review> findByMovieIdOrderByCreatedAtDesc(Long movieId, Pageable pageable);
+
+    // Lấy danh sách đánh giá của tôi
+    Page<Review> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 
 }

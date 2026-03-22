@@ -51,4 +51,6 @@ public interface MovieService {
     // Nếu replyToId == null: tạo review gốc -> trả ReviewResponse
     // Nếu replyToId != null: tạo reply -> trả ReviewResponse.ReplyInfo
     Object createReview(CreateReviewRequest request, String email);
+
+    boolean toggleFavorite(Long movieId, String email);
 }
