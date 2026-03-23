@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
                 .fullName(user.getFullName())
                 .dateOfBirth(user.getDateOfBirth())
                 .avatarUrl(user.getAvatarUrl())
-                .provider("LOCAL")
+                .provider(user.getProvider() != null ? user.getProvider().name() : "LOCAL")
                 .build();
     }
 
@@ -91,6 +91,7 @@ public class UserServiceImpl implements UserService {
                 .gender(user.getGender())
                 .phone(user.getPhone())
                 .avatarUrl(user.getAvatarUrl())
+                .provider(user.getProvider() != null ? user.getProvider().name() : "LOCAL")
                 .build();
     }
 
