@@ -1,5 +1,7 @@
 package com.vn.vodka_server.service.impl;
 
+import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -10,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vn.vodka_server.dto.request.ChangePasswordRequest;
+import com.vn.vodka_server.dto.request.UpdateHistoryRequest;
 import com.vn.vodka_server.dto.request.UpdateProfileRequest;
 import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
 import com.vn.vodka_server.dto.response.GenreResponse;
@@ -25,6 +28,7 @@ import com.vn.vodka_server.model.Tag;
 import com.vn.vodka_server.model.User;
 import com.vn.vodka_server.model.WatchHistory;
 import com.vn.vodka_server.repository.FavoriteRepository;
+import com.vn.vodka_server.repository.MovieRepository;
 import com.vn.vodka_server.repository.ReviewRepository;
 import com.vn.vodka_server.repository.UserRepository;
 import com.vn.vodka_server.repository.WatchHistoryRepository;
@@ -41,6 +45,7 @@ public class UserServiceImpl implements UserService {
     private final FavoriteRepository favoriteRepository;
     private final WatchHistoryRepository watchHistoryRepository;
     private final ReviewRepository reviewRepository;
+    private final MovieRepository movieRepository;
 
     @Override
     public UserInfo updateProfile(String email, UpdateProfileRequest request) {
@@ -149,6 +154,26 @@ public class UserServiceImpl implements UserService {
         return reviewPage.map(this::mapToReviewResponse);
     }
 
+    @Override
+    public void updateHistory(String email, UpdateHistoryRequest request) {
+        User user = findUserByEmail(email);
+        Movie movie = findMovieById(request.getMovieId());
+
+        Optional<WatchHistory> watchHistory = watchHistoryRepository.findByUserAndMovie(user, movie);
+
+        if (watchHistory.isPresent()) {
+            watchHistory.get().setWatchedAt(new Date());
+            watchHistoryRepository.save(watchHistory.get());
+        } else {
+            WatchHistory newWatchHistory = WatchHistory.builder()
+                    .user(user)
+                    .movie(movie)
+                    .watchedAt(new Date())
+                    .build();
+            watchHistoryRepository.save(newWatchHistory);
+        }
+    }
+
     // HELPER METHOD
 
     private void validatePagination(int page, int pageSize) {
@@ -161,6 +186,11 @@ public class UserServiceImpl implements UserService {
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+    }
+
+    private Movie findMovieById(Long movieId) {
+        return movieRepository.findById(movieId)
+                .orElseThrow(() -> new RuntimeException("Phim không tồn tại"));
     }
 
     private FeaturedMovieResponse mapToFeaturedMovieResponse(Movie movie) {

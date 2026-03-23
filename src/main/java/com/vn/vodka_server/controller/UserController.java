@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vn.vodka_server.dto.request.ChangePasswordRequest;
+import com.vn.vodka_server.dto.request.UpdateHistoryRequest;
 import com.vn.vodka_server.dto.request.UpdateProfileRequest;
 import com.vn.vodka_server.dto.response.ApiResponse;
 import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
@@ -102,6 +103,17 @@ public class UserController {
                     .data(resultPage.getContent())
                     .pagination(meta)
                     .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    // Cập nhật lịch sử xem phim
+    @PutMapping("/history")
+    public ResponseEntity<ApiResponse> updateHistory(Principal principal, @RequestBody UpdateHistoryRequest request) {
+        try {
+            userService.updateHistory(principal.getName(), request);
+            return ResponseEntity.ok(ApiResponse.success("Cập nhật thành công", null));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }

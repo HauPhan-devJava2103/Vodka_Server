@@ -1,6 +1,7 @@
 package com.vn.vodka_server.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.vn.vodka_server.model.Movie;
 import com.vn.vodka_server.model.User;
 import com.vn.vodka_server.model.WatchHistory;
 
@@ -19,4 +21,7 @@ public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Long
 
     // Lấy danh sách phim đã xem của user
     Page<WatchHistory> findByUserOrderByWatchedAtDesc(User user, Pageable pageable);
+
+    // Tìm lịch sử xem phim của user với movie cụ thể
+    Optional<WatchHistory> findByUserAndMovie(User user, Movie movie);
 }

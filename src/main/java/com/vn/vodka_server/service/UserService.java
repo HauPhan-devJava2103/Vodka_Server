@@ -3,6 +3,7 @@ package com.vn.vodka_server.service;
 import org.springframework.data.domain.Page;
 
 import com.vn.vodka_server.dto.request.ChangePasswordRequest;
+import com.vn.vodka_server.dto.request.UpdateHistoryRequest;
 import com.vn.vodka_server.dto.request.UpdateProfileRequest;
 import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
 import com.vn.vodka_server.dto.response.ReviewResponse;
@@ -21,5 +22,7 @@ public interface UserService {
     Page<WatchHistoryResponse> getHistory(String email, int page, int pageSize);
 
     Page<ReviewResponse> getReviews(String email, int page, int pageSize);
+
+    void updateHistory(String email, UpdateHistoryRequest request);
 
 }
