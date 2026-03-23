@@ -20,7 +20,7 @@ public class TagServiceImpl implements TagService {
     public List<TagResponse> getAllTags() {
         return tagRepository.findAllByVisibleTrueOrderByNameAsc().stream()
                 .map(tag -> TagResponse.builder()
-                        .id(String.valueOf(tag.getId()))
+                        .id(tag.getId())
                         .name(tag.getName())
                         .slug(tag.getSlug())
                         .build())

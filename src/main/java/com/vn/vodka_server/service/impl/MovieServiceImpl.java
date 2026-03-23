@@ -357,7 +357,7 @@ public class MovieServiceImpl implements MovieService {
         // Mapper Genre sang GenreResponse
         private GenreResponse mapToGenreResponse(Genre genre) {
                 return GenreResponse.builder()
-                                .id(String.valueOf(genre.getId()))
+                                .id(genre.getId())
                                 .name(genre.getName())
                                 .slug(genre.getSlug())
                                 .build();
@@ -366,7 +366,7 @@ public class MovieServiceImpl implements MovieService {
         // Mapper Tag sang TagResponse
         private TagResponse mapToTagResponse(Tag tag) {
                 return TagResponse.builder()
-                                .id(String.valueOf(tag.getId()))
+                                .id(tag.getId())
                                 .name(tag.getName())
                                 .slug(tag.getSlug())
                                 .build();
