@@ -24,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    private static final String OTP_EXPIRY_DISPLAY = "30 giây";
+    private static final String OTP_EXPIRY_DISPLAY = "10 phút";
 
     @Override
     public void sendOtpEmail(String toEmail, String otp) {

@@ -40,7 +40,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/upload/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/genres").permitAll() // Cho phép xem thể loại không cần
-                                                                                    // đăng nhập
+                                                                                    // đăng nhập
+                        .requestMatchers(HttpMethod.GET, "/api/tags").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll() // Cho phép xem replies không
+                                                                                        // cần đăng nhập
                         .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
                         .anyRequest().authenticated() // Còn lại phải có Token
                 )

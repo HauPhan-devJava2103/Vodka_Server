@@ -4,15 +4,44 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vn.vodka_server.dto.request.CreateReviewRequest;
-import com.vn.vodka_server.dto.response.*;
+import com.vn.vodka_server.dto.response.ApiResponse;
+import com.vn.vodka_server.dto.response.EpisodeResponse;
+import com.vn.vodka_server.dto.response.FeaturedMovieResponse;
+import com.vn.vodka_server.dto.response.GenreResponse;
+import com.vn.vodka_server.dto.response.MovieDetailResponse;
+import com.vn.vodka_server.dto.response.MovieStatsResponse;
+import com.vn.vodka_server.dto.response.PaginationMeta;
+import com.vn.vodka_server.dto.response.ReviewResponse;
+import com.vn.vodka_server.dto.response.SeasonResponse;
+import com.vn.vodka_server.dto.response.TagResponse;
+import com.vn.vodka_server.dto.response.WatchMovieResponse;
 import com.vn.vodka_server.exception.BadRequestException;
 import com.vn.vodka_server.exception.ResourceNotFoundException;
-import com.vn.vodka_server.model.*;
-import com.vn.vodka_server.repository.*;
+import com.vn.vodka_server.model.Episode;
+import com.vn.vodka_server.model.Genre;
+import com.vn.vodka_server.model.Movie;
+import com.vn.vodka_server.model.Review;
+import com.vn.vodka_server.model.ReviewReply;
+import com.vn.vodka_server.model.Season;
+import com.vn.vodka_server.model.Tag;
+import com.vn.vodka_server.model.User;
+import com.vn.vodka_server.model.WatchHistory;
+import com.vn.vodka_server.repository.EpisodeRepository;
+import com.vn.vodka_server.repository.GenreRepository;
+import com.vn.vodka_server.repository.MovieRepository;
+import com.vn.vodka_server.repository.ReviewReplyRepository;
+import com.vn.vodka_server.repository.ReviewRepository;
+import com.vn.vodka_server.repository.SeasonRepository;
+import com.vn.vodka_server.repository.UserRepository;
+import com.vn.vodka_server.repository.WatchHistoryRepository;
 import com.vn.vodka_server.service.MovieService;
 
 import lombok.RequiredArgsConstructor;
@@ -362,12 +391,20 @@ public class MovieServiceImpl implements MovieService {
 
         // Mapper Genre sang GenreResponse
         private GenreResponse mapToGenreResponse(Genre genre) {
-                return new GenreResponse(genre.getId(), genre.getName(), genre.getSlug());
+                return GenreResponse.builder()
+                                .id(genre.getId())
+                                .name(genre.getName())
+                                .slug(genre.getSlug())
+                                .build();
         }
 
         // Mapper Tag sang TagResponse
         private TagResponse mapToTagResponse(Tag tag) {
-                return new TagResponse(tag.getId(), tag.getName(), tag.getSlug());
+                return TagResponse.builder()
+                                .id(tag.getId())
+                                .name(tag.getName())
+                                .slug(tag.getSlug())
+                                .build();
         }
 
         // Mapper Movie sang FeaturedMovieResponse
