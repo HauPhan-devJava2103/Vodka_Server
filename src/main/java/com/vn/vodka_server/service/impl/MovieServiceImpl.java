@@ -1,6 +1,7 @@
 package com.vn.vodka_server.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,7 @@ public class MovieServiceImpl implements MovieService {
         private final GenreRepository genreRepository;
         private final UserRepository userRepository;
         private final EpisodeRepository episodeRepository;
+        private final FavoriteRepository favoriteRepository;
 
         // Lấy 8 phim nổi bật nhất (8 phim có rating cao nhất)
         @Override
@@ -515,6 +517,27 @@ public class MovieServiceImpl implements MovieService {
                                                         ? reply.getCreatedAt().toInstant().toString()
                                                         : null)
                                         .build();
+                }
+        }
+
+        @Override
+        public boolean toggleFavorite(Long movieId, String email) {
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResourceNotFoundException("User không tồn tại"));
+                Movie movie = movieRepository.findById(movieId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Movie không tồn tại"));
+
+                Optional<Favorite> favorite = favoriteRepository.findByUserAndMovie(user, movie);
+                if (favorite.isPresent()) {
+                        favoriteRepository.delete(favorite.get());
+                        return false;
+                } else {
+                        Favorite newFavorite = Favorite.builder()
+                                        .user(user)
+                                        .movie(movie)
+                                        .build();
+                        favoriteRepository.save(newFavorite);
+                        return true;
                 }
         }
 
