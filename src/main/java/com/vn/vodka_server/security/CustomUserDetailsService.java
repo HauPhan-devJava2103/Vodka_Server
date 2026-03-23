@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
-                user.getPassword(),
+                user.getPassword() != null ? user.getPassword() : "{noop}N/A",
                 isActive,   // enabled - false nếu INACTIVE → tự động từ chối
                 true,       // accountNonExpired
                 true,       // credentialsNonExpired
