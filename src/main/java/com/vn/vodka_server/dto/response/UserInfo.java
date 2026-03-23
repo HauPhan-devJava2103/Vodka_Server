@@ -17,7 +17,7 @@ import lombok.Data;
 public class UserInfo {
     private Long id;
     private String fullName;
-    @JsonFormat(pattern = "MM/dd/yyyy")
+    @JsonFormat(pattern = "MM/dd/yyyy", timezone = "Asia/Ho_Chi_Minh")
     private Date dateOfBirth;
     private EGender gender;
     private String phone;

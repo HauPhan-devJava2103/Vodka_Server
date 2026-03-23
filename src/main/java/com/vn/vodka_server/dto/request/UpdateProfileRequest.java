@@ -22,7 +22,7 @@ public class UpdateProfileRequest {
 
     @NotNull(message = "dateOfBirth must be not null")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @JsonFormat(pattern = "MM/dd/yyyy")
+    @JsonFormat(pattern = "MM/dd/yyyy", timezone = "Asia/Ho_Chi_Minh")
     private Date dateOfBirth;
 
     @NotBlank(message = "Số điện thoại không được để trống")
