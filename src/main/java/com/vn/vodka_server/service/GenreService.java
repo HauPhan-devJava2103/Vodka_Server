@@ -22,4 +22,8 @@ public interface GenreService {
 
     // Admin4: Cập nhật genre
     GenreResponse updateGenre(Long id, CreateGenreRequest request);
+
+    // Admin5: Xóa genre
+    void deleteGenre(Long id);
 }
+

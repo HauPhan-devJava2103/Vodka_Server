@@ -3,6 +3,7 @@ package com.vn.vodka_server.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,5 +73,12 @@ public class GenreController {
             @PathVariable Long id,
             @Valid @RequestBody CreateGenreRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật thành công", genreService.updateGenre(id, request)));
+    }
+
+    // API Admin5: Xóa genre
+    @DeleteMapping("/api/admin/genres/{id}")
+    public ResponseEntity<ApiResponse> deleteGenre(@PathVariable Long id) {
+        genreService.deleteGenre(id);
+        return ResponseEntity.ok(ApiResponse.success("Xóa thể loại thành công", null));
     }
 }

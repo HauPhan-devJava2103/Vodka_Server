@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vn.vodka_server.dto.projection.GenreAdminProjection;
 import com.vn.vodka_server.dto.request.CreateGenreRequest;
@@ -112,6 +113,22 @@ public class GenreServiceImpl implements GenreService {
 
         // 4. Trả về data
         return getAdminGenreById(id);
+    }
+
+    // Admin5: Xóa genre
+    @Override
+    @Transactional
+    public void deleteGenre(Long id) {
+        // 1. Tìm genre — ném 404 nếu không tồn tại
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Thể loại không tồn tại"));
+
+        // 2. Gỡ liên kết với tất cả movie (xóa dữ liệu bảng movie_genre)
+        // Hibernate theo dõi thay đổi -> tự sinh DELETE FROM movie_genre
+        genre.getMovies().forEach(movie -> movie.getGenres().remove(genre));
+
+        // 3. Xóa genre sau khi đã gỡ liên kết
+        genreRepository.delete(genre);
     }
 
     // Helper methods
