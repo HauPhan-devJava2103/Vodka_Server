@@ -347,7 +347,6 @@ public class MovieServiceImpl implements MovieService {
                                 .map(s -> SeasonResponse.builder()
                                                 .id(s.getId())
                                                 .title(s.getTitle())
-                                                .thumbnailUrl(s.getThumbnailUrl())
                                                 .episodes(s.getEpisodes().stream()
                                                                 .map(e -> EpisodeResponse.builder()
                                                                                 .id(e.getId())

@@ -14,6 +14,5 @@ import lombok.NoArgsConstructor;
 public class SeasonResponse {
     private Long id;
     private String title;
-    private String thumbnailUrl;
     private List<EpisodeResponse> episodes;
 }

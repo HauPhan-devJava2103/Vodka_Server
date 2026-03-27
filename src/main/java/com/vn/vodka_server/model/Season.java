@@ -31,9 +31,6 @@ public class Season extends AbstractEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "thumbnail_url")
-    private String thumbnailUrl;
-
     @Column(name = "season_number")
     private Integer seasonNumber;
 
