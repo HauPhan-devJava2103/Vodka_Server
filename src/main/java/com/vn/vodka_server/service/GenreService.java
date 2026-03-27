@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 
 import com.vn.vodka_server.dto.request.CreateGenreRequest;
 import com.vn.vodka_server.dto.response.GenreResponse;
+import com.vn.vodka_server.dto.response.GenreStatsResponse;
 
 public interface GenreService {
     // Lấy danh sách tất cả các thể loại và chuyển đổi sang DTO
@@ -25,5 +26,9 @@ public interface GenreService {
 
     // Admin5: Xóa genre
     void deleteGenre(Long id);
+
+    // Admin6: Thống kê tổng quan
+    GenreStatsResponse getGenreStats();
 }
+
 

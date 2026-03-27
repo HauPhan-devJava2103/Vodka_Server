@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vn.vodka_server.dto.projection.GenreAdminProjection;
 import com.vn.vodka_server.dto.request.CreateGenreRequest;
 import com.vn.vodka_server.dto.response.GenreResponse;
+import com.vn.vodka_server.dto.response.GenreStatsResponse;
 import com.vn.vodka_server.exception.BadRequestException;
 import com.vn.vodka_server.exception.ResourceNotFoundException;
 import com.vn.vodka_server.model.Genre;
@@ -131,12 +132,65 @@ public class GenreServiceImpl implements GenreService {
         genreRepository.delete(genre);
     }
 
+    // Admin6: Thống kê tổng quan
+    @Override
+    public GenreStatsResponse getGenreStats() {
+        // 1. Tổng số genres
+        long totalGenres = genreRepository.count();
+
+        // 2. Genre phổ biến nhất — Pageable(0,1) ~ LIMIT 1
+        List<GenreAdminProjection> popularList = genreRepository
+                .findMostPopularGenre(PageRequest.of(0, 1));
+        GenreAdminProjection popularProjection = popularList.isEmpty() ? null : popularList.get(0);
+        GenreStatsResponse.MostPopularGenre mostPopular;
+        if (popularProjection == null)
+            mostPopular = null;
+        else
+            mostPopular = GenreStatsResponse.MostPopularGenre.builder()
+                    .name(popularProjection.getName())
+                    .movieCount(popularProjection.getMovieCount())
+                    .build();
+
+        // 3. Số phim chưa gắn thể loại
+        long unclassified = genreRepository.countMoviesWithNoGenre();
+
+        // 4. Genre mới tạo gần đây nhất
+        Genre latestGenre = genreRepository.findTopByOrderByCreatedAtDesc();
+        GenreStatsResponse.LatestGenre latest;
+        if (latestGenre == null)
+            latest = null;
+        else
+            latest = GenreStatsResponse.LatestGenre.builder()
+                    .name(latestGenre.getName())
+                    .createdAt(toRelativeTime(latestGenre.getCreatedAt()))
+                    .build();
+
+        return GenreStatsResponse.builder()
+                .totalGenres(totalGenres)
+                .mostPopularGenre(mostPopular)
+                .unclassifiedMovies(unclassified)
+                .latestGenre(latest)
+                .build();
+    }
+
     // Helper methods
     // Format Date -> "dd/MM/yyyy", trả về "N/A" nếu null
     private String formatDate(Date date) {
         if (date == null)
             return "N/A";
         return new SimpleDateFormat("dd/MM/yyyy").format(date);
+    }
+
+    // Chuyển date thành chuỗi dạng: "Hôm nay", "Hôm qua", "N ngày trước"
+    private String toRelativeTime(Date date) {
+        if (date == null)
+            return "N/A";
+        long days = (System.currentTimeMillis() - date.getTime()) / 86400000;
+        if (days == 0)
+            return "Hôm nay";
+        if (days == 1)
+            return "Hôm qua";
+        return days + " ngày trước";
     }
 
     // Parse sort string từ client -> Spring Sort object

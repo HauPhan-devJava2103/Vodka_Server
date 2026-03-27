@@ -1,5 +1,6 @@
 package com.vn.vodka_server.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -47,4 +48,22 @@ public interface GenreRepository extends JpaRepository<Genre, Long> {
                 GROUP BY g.id, g.name, g.slug, g.createdAt, g.updatedAt
             """)
     Optional<GenreAdminProjection> findAdminGenreById(@Param("id") Long id);
+
+    // Stats: Genre có nhiều phim nhất (JPQL + Pageable để lấy top 1)
+    @Query("""
+                SELECT g.name AS name, COUNT(m.id) AS movieCount
+                FROM Genre g
+                JOIN g.movies m
+                GROUP BY g.id, g.name
+                ORDER BY COUNT(m.id) DESC
+            """)
+    List<GenreAdminProjection> findMostPopularGenre(Pageable pageable);
+
+    // Stats: Đếm phim chưa gắn thể loại nào
+    @Query("SELECT COUNT(m) FROM Movie m WHERE m.genres IS EMPTY")
+    long countMoviesWithNoGenre();
+
+    // Stats: Genre mới tạo gần đây nhất
+    Genre findTopByOrderByCreatedAtDesc();
 }
+

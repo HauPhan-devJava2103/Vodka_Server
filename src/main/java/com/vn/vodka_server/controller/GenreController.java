@@ -81,4 +81,10 @@ public class GenreController {
         genreService.deleteGenre(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa thể loại thành công", null));
     }
+
+    // API Admin6: Thống kê tổng quan genre
+    @GetMapping("/api/admin/genre/stats")
+    public ResponseEntity<ApiResponse> getGenreStats() {
+        return ResponseEntity.ok(ApiResponse.success("OK", genreService.getGenreStats()));
+    }
 }
