@@ -14,6 +14,7 @@ import com.vn.vodka_server.dto.projection.GenreAdminProjection;
 import com.vn.vodka_server.dto.request.CreateGenreRequest;
 import com.vn.vodka_server.dto.response.GenreResponse;
 import com.vn.vodka_server.exception.BadRequestException;
+import com.vn.vodka_server.exception.ResourceNotFoundException;
 import com.vn.vodka_server.model.Genre;
 import com.vn.vodka_server.repository.GenreRepository;
 import com.vn.vodka_server.service.GenreService;
@@ -35,6 +36,7 @@ public class GenreServiceImpl implements GenreService {
                 .toList();
     }
 
+    // Admin1: Lấy danh sách genres có phân trang, tìm kiếm, sắp xếp
     @Override
     public Page<GenreResponse> getAdminGenres(int page, int pageSize, String search, String sort) {
         // 1. Parse sort string thành Spring Sort
@@ -50,6 +52,7 @@ public class GenreServiceImpl implements GenreService {
         return projectionPage.map(this::mapToAdminResponse);
     }
 
+    // Admin2: Tạo mới thể loại
     @Override
     public GenreResponse createGenre(CreateGenreRequest request) {
         // 1. Kiểm tra slug đã tồn tại chưa
@@ -74,6 +77,44 @@ public class GenreServiceImpl implements GenreService {
                 .build();
     }
 
+    // Admin3: Lấy chi tiết 1 genre theo ID
+    @Override
+    public GenreResponse getAdminGenreById(Long id) {
+        GenreAdminProjection p = genreRepository.findAdminGenreById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Thể loại không tồn tại"));
+
+        return GenreResponse.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .slug(p.getSlug())
+                .movieCount(p.getMovieCount())
+                .createdAt(formatDate(p.getCreatedAt()))
+                .updatedAt(formatDate(p.getUpdatedAt()))
+                .build();
+    }
+
+    // Admin4: Cập nhật genre
+    @Override
+    public GenreResponse updateGenre(Long id, CreateGenreRequest request) {
+        // 1. Tìm genre — ném 404 nếu không tồn tại
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Thể loại không tồn tại"));
+
+        // 2. Kiểm tra slug trùng với genre KHÁC (không tính nó)
+        if (genreRepository.existsBySlugAndIdNot(request.getSlug(), id)) {
+            throw new BadRequestException("Slug '" + request.getSlug() + "' đã tồn tại");
+        }
+
+        // 3. Cập nhật — Hibernate tự set updatedAt khi save
+        genre.setName(request.getName());
+        genre.setSlug(request.getSlug());
+        genreRepository.save(genre);
+
+        // 4. Trả về data
+        return getAdminGenreById(id);
+    }
+
+    // Helper methods
     // Format Date -> "dd/MM/yyyy", trả về "N/A" nếu null
     private String formatDate(Date date) {
         if (date == null)

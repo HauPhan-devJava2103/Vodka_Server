@@ -4,7 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,5 +59,18 @@ public class GenreController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Tạo thể loại thành công", created));
     }
-}
 
+    // API Admin3: Lấy chi tiết genre theo ID
+    @GetMapping("/api/admin/genres/{id}")
+    public ResponseEntity<ApiResponse> getAdminGenreById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success("OK", genreService.getAdminGenreById(id)));
+    }
+
+    // API Admin4: Cập nhật genre
+    @PutMapping("/api/admin/genres/{id}")
+    public ResponseEntity<ApiResponse> updateGenre(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateGenreRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật thành công", genreService.updateGenre(id, request)));
+    }
+}

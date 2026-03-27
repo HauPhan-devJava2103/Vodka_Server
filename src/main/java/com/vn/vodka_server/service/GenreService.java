@@ -11,10 +11,15 @@ public interface GenreService {
     // Lấy danh sách tất cả các thể loại và chuyển đổi sang DTO
     List<GenreResponse> getAllGenres();
 
-    // Admin: Lấy danh sách genres có phân trang, tìm kiếm, sắp xếp
+    // Admin1: Lấy danh sách genres có phân trang, tìm kiếm, sắp xếp
     Page<GenreResponse> getAdminGenres(int page, int pageSize, String search, String sort);
 
-    // Admin: Tạo mới thể loại
+    // Admin2: Tạo mới thể loại
     GenreResponse createGenre(CreateGenreRequest request);
-}
 
+    // Admin3: Lấy chi tiết 1 genre theo ID
+    GenreResponse getAdminGenreById(Long id);
+
+    // Admin4: Cập nhật genre
+    GenreResponse updateGenre(Long id, CreateGenreRequest request);
+}
