@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.vn.vodka_server.dto.request.CreateGenreRequest;
 import com.vn.vodka_server.dto.response.GenreResponse;
 
 public interface GenreService {
@@ -12,4 +13,8 @@ public interface GenreService {
 
     // Admin: Lấy danh sách genres có phân trang, tìm kiếm, sắp xếp
     Page<GenreResponse> getAdminGenres(int page, int pageSize, String search, String sort);
+
+    // Admin: Tạo mới thể loại
+    GenreResponse createGenre(CreateGenreRequest request);
 }
+
