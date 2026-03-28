@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.vn.vodka_server.dto.response.TagStatsResponse;
+
 import com.vn.vodka_server.dto.response.TagResponse;
 
 public interface TagService {
@@ -11,4 +13,7 @@ public interface TagService {
 
     // Admin1: Lấy danh sách tags có phân trang, tìm kiếm, sắp xếp
     Page<TagResponse> getAdminTags(int page, int pageSize, String search, String sort);
+
+    // Admin2: Thống kê tổng quan tags
+    TagStatsResponse getTagStats();
 }

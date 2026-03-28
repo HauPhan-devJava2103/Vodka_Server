@@ -25,7 +25,7 @@ public class TagController {
         return ResponseEntity.ok(ApiResponse.success("Success", tagService.getAllTags()));
     }
 
-    // API Admin: Lấy danh sách tags với phân trang, tìm kiếm, sắp xếp
+    // API Admin1: Lấy danh sách tags với phân trang, tìm kiếm, sắp xếp
     @GetMapping("/api/admin/tags")
     public ResponseEntity<ApiResponse> getAdminTags(
             @RequestParam(defaultValue = "1") int page,
@@ -44,4 +44,10 @@ public class TagController {
 
         return ResponseEntity.ok(ApiResponse.success("OK", result.getContent(), pagination));
     }
-}
+
+    // API Admin2: Thống kê tổng quan tags
+    @GetMapping("/api/admin/tags/stats")
+    public ResponseEntity<ApiResponse> getTagStats() {
+        return ResponseEntity.ok(ApiResponse.success("OK", tagService.getTagStats()));
+    }
+}

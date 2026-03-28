@@ -32,4 +32,21 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
                 GROUP BY t.id, t.name, t.slug, t.createdAt, t.updatedAt
             """)
     Page<TagAdminProjection> findAdminTags(@Param("search") String search, Pageable pageable);
+
+    // Stats: Tag phổ biến nhất (INNER JOIN — chỉ lấy tag đã có phim)
+    @Query("""
+                SELECT t.name AS name, COUNT(m.id) AS movieCount
+                FROM Tag t
+                JOIN t.movies m
+                GROUP BY t.id, t.name
+                ORDER BY COUNT(m.id) DESC
+            """)
+    List<TagAdminProjection> findMostPopularTag(Pageable pageable);
+
+    // Stats: Đếm phim chưa gắn tag nào
+    @Query("SELECT COUNT(m) FROM Movie m WHERE m.tags IS EMPTY")
+    long countMoviesWithNoTag();
+
+    // Stats: Tag mới tạo gần đây nhất
+    Tag findTopByOrderByCreatedAtDesc();
 }
