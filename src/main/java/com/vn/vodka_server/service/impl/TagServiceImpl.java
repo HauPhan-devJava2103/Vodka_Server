@@ -11,8 +11,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vn.vodka_server.dto.projection.TagAdminProjection;
+import com.vn.vodka_server.dto.request.CreateTagRequest;
 import com.vn.vodka_server.dto.response.TagResponse;
 import com.vn.vodka_server.dto.response.TagStatsResponse;
+import com.vn.vodka_server.exception.BadRequestException;
 import com.vn.vodka_server.model.Tag;
 import com.vn.vodka_server.repository.TagRepository;
 import com.vn.vodka_server.service.TagService;
@@ -89,6 +91,31 @@ public class TagServiceImpl implements TagService {
                 .mostPopularTag(mostPopular)
                 .unclassifiedMovies(unclassified)
                 .latestTag(latestTag)
+                .build();
+    }
+
+    // Admin3: Tạo tag mới
+    @Override
+    public TagResponse createTag(CreateTagRequest request) {
+        // 1. Kiểm tra slug đã tồn tại chưa
+        if (tagRepository.existsBySlug(request.getSlug())) {
+            throw new BadRequestException("Slug '" + request.getSlug() + "' đã tồn tại");
+        }
+
+        // 2. Tạo và lưu entity vào DB
+        Tag tag = Tag.builder()
+                .name(request.getName())
+                .slug(request.getSlug())
+                .build();
+        Tag saved = tagRepository.save(tag);
+
+        // 3. Map sang response — tag mới không có phim nào nên movieCount = 0
+        return TagResponse.builder()
+                .id(saved.getId())
+                .name(saved.getName())
+                .slug(saved.getSlug())
+                .movieCount(0L)
+                .createdAt(formatDate(saved.getCreatedAt()))
                 .build();
     }
 

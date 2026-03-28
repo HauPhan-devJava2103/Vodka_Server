@@ -49,4 +49,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
     // Stats: Tag mới tạo gần đây nhất
     Tag findTopByOrderByCreatedAtDesc();
+
+    // Kiểm tra slug đã tồn tại chưa (dùng khi create)
+    boolean existsBySlug(String slug);
 }

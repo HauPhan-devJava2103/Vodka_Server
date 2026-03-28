@@ -1,16 +1,21 @@
 package com.vn.vodka_server.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vn.vodka_server.dto.request.CreateTagRequest;
 import com.vn.vodka_server.dto.response.ApiResponse;
 import com.vn.vodka_server.dto.response.PaginationMeta;
 import com.vn.vodka_server.dto.response.TagResponse;
 import com.vn.vodka_server.service.TagService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -49,5 +54,13 @@ public class TagController {
     @GetMapping("/api/admin/tags/stats")
     public ResponseEntity<ApiResponse> getTagStats() {
         return ResponseEntity.ok(ApiResponse.success("OK", tagService.getTagStats()));
+    }
+
+    // API Admin3: Tạo mới tag
+    @PostMapping("/api/admin/tags")
+    public ResponseEntity<ApiResponse> createTag(@Valid @RequestBody CreateTagRequest request) {
+        TagResponse created = tagService.createTag(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Tạo tag thành công", created));
     }
 }

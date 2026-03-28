@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import com.vn.vodka_server.dto.response.TagStatsResponse;
-
+import com.vn.vodka_server.dto.request.CreateTagRequest;
 import com.vn.vodka_server.dto.response.TagResponse;
+import com.vn.vodka_server.dto.response.TagStatsResponse;
 
 public interface TagService {
     List<TagResponse> getAllTags();
@@ -16,4 +16,7 @@ public interface TagService {
 
     // Admin2: Thống kê tổng quan tags
     TagStatsResponse getTagStats();
+
+    // Admin3: Tạo tag mới
+    TagResponse createTag(CreateTagRequest request);
 }
