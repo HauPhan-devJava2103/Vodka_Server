@@ -56,7 +56,7 @@ public class User extends AbstractEntity {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "avatar_url")
+    @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
 
     @Enumerated(EnumType.STRING)

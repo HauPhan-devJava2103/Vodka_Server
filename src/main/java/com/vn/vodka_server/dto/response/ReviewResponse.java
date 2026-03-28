@@ -23,6 +23,10 @@ public class ReviewResponse {
     private String content;
     private String createdAt;
 
+    // Thông tin movie (Admin API)
+    private Long movieId;
+    private String movieTitle;
+
     // Danh sách reply của review này
     private List<ReplyInfo> replied;
 

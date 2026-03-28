@@ -4,10 +4,12 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
 // DTO nhận dữ liệu tạo review hoặc reply từ FE
 @Data
+@Builder
 public class CreateReviewRequest {
 
     // ID phim cần đánh giá (bắt buộc)
