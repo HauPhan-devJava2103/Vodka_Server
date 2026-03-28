@@ -1,6 +1,7 @@
 package com.vn.vodka_server.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,4 +53,20 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
     // Kiểm tra slug đã tồn tại chưa (dùng khi create)
     boolean existsBySlug(String slug);
+
+    // Kiểm tra slug đã tồn tại ở tag KHÁC chưa (dùng khi update)
+    boolean existsBySlugAndIdNot(String slug, Long id);
+
+    // Admin: Lấy chi tiết 1 tag theo ID (kèm movieCount, viewCount, dates)
+    @Query("""
+                SELECT t.id AS id, t.name AS name, t.slug AS slug,
+                       COUNT(DISTINCT m.id) AS movieCount,
+                       COALESCE(SUM(m.viewCount), 0) AS viewCount,
+                       t.createdAt AS createdAt, t.updatedAt AS updatedAt
+                FROM Tag t
+                LEFT JOIN t.movies m
+                WHERE t.id = :id
+                GROUP BY t.id, t.name, t.slug, t.createdAt, t.updatedAt
+            """)
+    Optional<TagAdminProjection> findAdminTagById(@Param("id") Long id);
 }

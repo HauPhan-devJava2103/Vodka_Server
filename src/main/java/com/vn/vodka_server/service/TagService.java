@@ -19,4 +19,7 @@ public interface TagService {
 
     // Admin3: Tạo tag mới
     TagResponse createTag(CreateTagRequest request);
+
+    // Admin4: Cập nhật tag
+    TagResponse updateTag(Long id, CreateTagRequest request);
 }

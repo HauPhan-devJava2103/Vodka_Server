@@ -15,6 +15,7 @@ import com.vn.vodka_server.dto.request.CreateTagRequest;
 import com.vn.vodka_server.dto.response.TagResponse;
 import com.vn.vodka_server.dto.response.TagStatsResponse;
 import com.vn.vodka_server.exception.BadRequestException;
+import com.vn.vodka_server.exception.ResourceNotFoundException;
 import com.vn.vodka_server.model.Tag;
 import com.vn.vodka_server.repository.TagRepository;
 import com.vn.vodka_server.service.TagService;
@@ -116,6 +117,42 @@ public class TagServiceImpl implements TagService {
                 .slug(saved.getSlug())
                 .movieCount(0L)
                 .createdAt(formatDate(saved.getCreatedAt()))
+                .build();
+    }
+
+    // Admin4: Cập nhật tag
+    @Override
+    public TagResponse updateTag(Long id, CreateTagRequest request) {
+        // 1. Tìm tag — ném 404 nếu không tồn tại
+        Tag tag = tagRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tag không tồn tại"));
+
+        // 2. Kiểm tra slug trùng với tag KHÁC (không tính chính nó)
+        if (tagRepository.existsBySlugAndIdNot(request.getSlug(), id)) {
+            throw new BadRequestException("Slug '" + request.getSlug() + "' đã tồn tại");
+        }
+
+        // 3. Cập nhật — Hibernate tự set updatedAt khi save
+        tag.setName(request.getName());
+        tag.setSlug(request.getSlug());
+        tagRepository.save(tag);
+
+        // 4. Return response
+        return getAdminTagById(id);
+    }
+
+    // Lấy chi tiết tag theo ID (dùng cho update)
+    private TagResponse getAdminTagById(Long id) {
+        TagAdminProjection p = tagRepository.findAdminTagById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tag không tồn tại"));
+
+        return TagResponse.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .slug(p.getSlug())
+                .movieCount(p.getMovieCount())
+                .createdAt(formatDate(p.getCreatedAt()))
+                .updatedAt(formatDate(p.getUpdatedAt()))
                 .build();
     }
 
