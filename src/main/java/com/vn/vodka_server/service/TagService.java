@@ -2,8 +2,13 @@ package com.vn.vodka_server.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.vn.vodka_server.dto.response.TagResponse;
 
 public interface TagService {
     List<TagResponse> getAllTags();
+
+    // Admin1: Lấy danh sách tags có phân trang, tìm kiếm, sắp xếp
+    Page<TagResponse> getAdminTags(int page, int pageSize, String search, String sort);
 }
