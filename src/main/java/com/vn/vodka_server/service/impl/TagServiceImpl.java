@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vn.vodka_server.dto.projection.TagAdminProjection;
 import com.vn.vodka_server.dto.request.CreateTagRequest;
@@ -200,6 +201,21 @@ public class TagServiceImpl implements TagService {
                 .createdAt(formatDate(p.getCreatedAt()))
                 .updatedAt(formatDate(p.getUpdatedAt()))
                 .build();
+    }
+    // Admin5: Xóa tag
+    @Override
+    @Transactional
+    public void deleteTag(Long id) {
+        // 1. Tìm tag — ném 404 nếu không tồn tại
+        Tag tag = tagRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tag không tồn tại"));
+
+        // 2. Gỡ liên kết với tất cả movie (xóa dữ liệu bảng movie_tag)
+        // Hibernate theo dõi thay đổi -> tự sinh DELETE FROM movie_tag
+        tag.getMovies().forEach(movie -> movie.getTags().remove(tag));
+
+        // 3. Xóa tag sau khi đã gỡ liên kết
+        tagRepository.delete(tag);
     }
 
 }

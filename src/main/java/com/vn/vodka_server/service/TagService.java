@@ -22,4 +22,7 @@ public interface TagService {
 
     // Admin4: Cập nhật tag
     TagResponse updateTag(Long id, CreateTagRequest request);
+
+    // Admin5: Xóa tag
+    void deleteTag(Long id);
 }
