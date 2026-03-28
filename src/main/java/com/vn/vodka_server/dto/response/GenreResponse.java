@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL) // Các trường ko được xét(nhận giá trị null) sẽ không được trả về trong Json
 public class GenreResponse {
     // ID của thể loại
     private Long id;
@@ -22,4 +22,10 @@ public class GenreResponse {
 
     // Slug dùng cho URL
     private String slug;
+
+    // Dùng cho api trả về danh sách genres của admin
+    private Long movieCount;
+    private Long viewCount;
+    private String createdAt; // format dd/MM/yyyy
+    private String updatedAt; // format dd/MM/yyyy
 }
