@@ -48,6 +48,9 @@ public class Movie extends AbstractEntity {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "movie_type")
+    private String movieType; // "SERIES" hoặc "SINGLE"
+
     @Column(name = "view_count")
     private Long viewCount;
 
