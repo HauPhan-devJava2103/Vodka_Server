@@ -24,4 +24,7 @@ public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Long
 
     // Tìm lịch sử xem phim của user với movie cụ thể
     Optional<WatchHistory> findByUserAndMovie(User user, Movie movie);
+
+    // Xóa tất cả lịch sử xem theo phim (dùng khi xóa phim)
+    void deleteByMovie(Movie movie);
 }
