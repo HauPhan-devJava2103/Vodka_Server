@@ -1,6 +1,7 @@
 package com.vn.vodka_server.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,5 +39,13 @@ public class AdminMovieController {
             @Valid @RequestBody UpdateMovieRequest request) {
         movieAdminService.updateMovie(id, request);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật phim thành công", null));
+    }
+
+    // Lấy chi tiết phim cho Admin
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getMovieDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.success("Lấy thông tin chi tiết phim thành công",
+                        movieAdminService.getMovieDetail(id)));
     }
 }

@@ -9,11 +9,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vn.vodka_server.dto.request.CreateMovieRequest;
-import com.vn.vodka_server.dto.request.CreateMovieRequest.EpisodeRequest;
 import com.vn.vodka_server.dto.request.CreateMovieRequest.GenreInput;
 import com.vn.vodka_server.dto.request.CreateMovieRequest.SeasonRequest;
 import com.vn.vodka_server.dto.request.CreateMovieRequest.TagInput;
 import com.vn.vodka_server.dto.request.UpdateMovieRequest;
+import com.vn.vodka_server.dto.response.AdminEpisodeResponse;
+import com.vn.vodka_server.dto.response.AdminMovieDetailResponse;
+import com.vn.vodka_server.dto.response.AdminSeasonResponse;
+import com.vn.vodka_server.dto.response.GenreResponse;
+import com.vn.vodka_server.dto.response.TagResponse;
 import com.vn.vodka_server.exception.BadRequestException;
 import com.vn.vodka_server.exception.ResourceNotFoundException;
 import com.vn.vodka_server.model.Episode;
@@ -345,5 +349,54 @@ public class MovieAdminServiceImpl implements MovieAdminService {
                 episodeRepository.save(ep);
             }
         }
+    }
+
+    // Lấy chi tiết phim cho Admin
+    @Override
+    @Transactional(readOnly = true)
+    public AdminMovieDetailResponse getMovieDetail(Long id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Phim với id = " + id + " không tồn tại"));
+
+        return AdminMovieDetailResponse.builder()
+                .id(movie.getId())
+                .title(movie.getTitle())
+                .description(movie.getDescription())
+                .releaseYear(movie.getReleaseYear())
+                .posterUrl(movie.getPostUrl())
+                .bannerUrl(movie.getBannerUrl())
+                .movieType(movie.getMovieType())
+                .genres(movie.getGenres().stream()
+                        .map(g -> GenreResponse.builder()
+                                .id(g.getId())
+                                .name(g.getName())
+                                .slug(g.getSlug())
+                                .build())
+                        .toList())
+                .tags(movie.getTags().stream()
+                        .map(t -> TagResponse.builder()
+                                .id(t.getId())
+                                .name(t.getName())
+                                .slug(t.getSlug())
+                                .build())
+                        .toList())
+                .seasons(movie.getSeasons().stream()
+                        .map(s -> AdminSeasonResponse.builder()
+                                .id(s.getId())
+                                .seasonNumber(s.getSeasonNumber())
+                                .title(s.getTitle())
+                                .episodes(s.getEpisodes().stream()
+                                        .map(e -> AdminEpisodeResponse.builder()
+                                                .id(e.getId())
+                                                .episodeNumber(e.getEpisodeNumber())
+                                                .title(e.getTitle())
+                                                .description(e.getDescription())
+                                                .videoUrl(e.getVideoUrl())
+                                                .duration(e.getDuration())
+                                                .build())
+                                        .toList())
+                                .build())
+                        .toList())
+                .build();
     }
 }
