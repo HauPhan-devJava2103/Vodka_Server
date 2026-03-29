@@ -58,4 +58,16 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             @Param("tagSlug") String tagSlug,
             @Param("genreSlugs") List<String> genreSlugs,
             Pageable pageable);
+
+    // Admin: Lấy danh sách phim có lọc theo genre, year, rating
+    @Query("SELECT DISTINCT m FROM Movie m " +
+            "LEFT JOIN m.genres g " +
+            "WHERE (:genreSlug IS NULL OR g.slug = :genreSlug) " +
+            "AND (:year IS NULL OR m.releaseYear = :year) " +
+            "AND (:minRating IS NULL OR m.rating >= :minRating)")
+    Page<Movie> findAdminMovies(
+            @Param("genreSlug") String genreSlug,
+            @Param("year") Integer year,
+            @Param("minRating") Double minRating,
+            Pageable pageable);
 }

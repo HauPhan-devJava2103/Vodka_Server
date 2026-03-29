@@ -83,7 +83,7 @@ public class GenreController {
     }
 
     // API Admin6: Thống kê tổng quan genre
-    @GetMapping("/api/admin/genre/stats")
+    @GetMapping("/api/admin/genres/stats")
     public ResponseEntity<ApiResponse> getGenreStats() {
         return ResponseEntity.ok(ApiResponse.success("OK", genreService.getGenreStats()));
     }
