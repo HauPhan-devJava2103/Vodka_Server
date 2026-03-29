@@ -2,6 +2,7 @@ package com.vn.vodka_server.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,5 +76,11 @@ public class AdminMovieController {
                 ApiResponse.success("Lấy thông tin chi tiết phim thành công",
                         movieAdminService.getMovieDetail(id)));
     }
-}
 
+    // Xóa phim theo id
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteMovie(@PathVariable Long id) {
+        movieAdminService.deleteMovie(id);
+        return ResponseEntity.ok(ApiResponse.success("Đã xóa phim thành công", null));
+    }
+}

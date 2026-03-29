@@ -21,4 +21,7 @@ public interface MovieAdminService {
     // Lấy danh sách phim cho Admin (phân trang + lọc + sắp xếp)
     Page<AdminMovieListResponse> getMovieList(int page, int limit, String genreSlug,
             Integer year, Double minRating, String sort);
+
+    // Xóa phim theo id
+    void deleteMovie(Long id);
 }

@@ -33,9 +33,11 @@ import com.vn.vodka_server.model.Season;
 import com.vn.vodka_server.model.Tag;
 import com.vn.vodka_server.repository.EpisodeRepository;
 import com.vn.vodka_server.repository.GenreRepository;
+import com.vn.vodka_server.repository.MediaRepository;
 import com.vn.vodka_server.repository.MovieRepository;
 import com.vn.vodka_server.repository.SeasonRepository;
 import com.vn.vodka_server.repository.TagRepository;
+import com.vn.vodka_server.repository.WatchHistoryRepository;
 import com.vn.vodka_server.service.MovieAdminService;
 
 import lombok.RequiredArgsConstructor;
@@ -56,6 +58,8 @@ public class MovieAdminServiceImpl implements MovieAdminService {
     private final TagRepository tagRepository;
     private final SeasonRepository seasonRepository;
     private final EpisodeRepository episodeRepository;
+    private final WatchHistoryRepository watchHistoryRepository;
+    private final MediaRepository mediaRepository;
 
     @Override
     public void createMovie(CreateMovieRequest request) {
@@ -447,5 +451,20 @@ public class MovieAdminServiceImpl implements MovieAdminService {
                         ? new SimpleDateFormat("yyyy-MM-dd").format(movie.getCreatedAt())
                         : null)
                 .build());
+    }
+
+    // Xóa phim theo id
+    @Override
+    public void deleteMovie(Long id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Phim với id = " + id + " không tồn tại"));
+
+        // Xóa các bảng con ko có cascade
+        watchHistoryRepository.deleteByMovie(movie);
+        mediaRepository.deleteByMovie(movie);
+
+        // Xóa movie (cascade tự xóa: seasons, episodes, reviews, replies, favorites,
+        // join tables)
+        movieRepository.delete(movie);
     }
 }
