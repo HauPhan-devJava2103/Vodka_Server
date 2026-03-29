@@ -1,8 +1,11 @@
 package com.vn.vodka_server.service;
 
+import org.springframework.data.domain.Page;
+
 import com.vn.vodka_server.dto.request.CreateMovieRequest;
 import com.vn.vodka_server.dto.request.UpdateMovieRequest;
 import com.vn.vodka_server.dto.response.AdminMovieDetailResponse;
+import com.vn.vodka_server.dto.response.AdminMovieListResponse;
 
 public interface MovieAdminService {
 
@@ -14,4 +17,8 @@ public interface MovieAdminService {
 
     // Lấy chi tiết phim cho Admin
     AdminMovieDetailResponse getMovieDetail(Long id);
+
+    // Lấy danh sách phim cho Admin (phân trang + lọc + sắp xếp)
+    Page<AdminMovieListResponse> getMovieList(int page, int limit, String genreSlug,
+            Integer year, Double minRating, String sort);
 }

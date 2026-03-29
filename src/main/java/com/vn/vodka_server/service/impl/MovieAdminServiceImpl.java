@@ -5,8 +5,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.text.SimpleDateFormat;
 
 import com.vn.vodka_server.dto.request.CreateMovieRequest;
 import com.vn.vodka_server.dto.request.CreateMovieRequest.GenreInput;
@@ -15,6 +20,7 @@ import com.vn.vodka_server.dto.request.CreateMovieRequest.TagInput;
 import com.vn.vodka_server.dto.request.UpdateMovieRequest;
 import com.vn.vodka_server.dto.response.AdminEpisodeResponse;
 import com.vn.vodka_server.dto.response.AdminMovieDetailResponse;
+import com.vn.vodka_server.dto.response.AdminMovieListResponse;
 import com.vn.vodka_server.dto.response.AdminSeasonResponse;
 import com.vn.vodka_server.dto.response.GenreResponse;
 import com.vn.vodka_server.dto.response.TagResponse;
@@ -398,5 +404,48 @@ public class MovieAdminServiceImpl implements MovieAdminService {
                                 .build())
                         .toList())
                 .build();
+    }
+
+    // Lấy danh sách phim cho Admin
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AdminMovieListResponse> getMovieList(int page, int limit, String genreSlug,
+            Integer year, Double minRating, String sort) {
+        // 1. Chuẩn hóa param rỗng thành null
+        String safeGenre;
+        if (genreSlug != null && !genreSlug.trim().isEmpty()) {
+            safeGenre = genreSlug.trim();
+        } else {
+            safeGenre = null;
+        }
+
+        // 2. Xử lý sort
+        Sort sortOrder = switch (sort != null ? sort : "") {
+            case "rating-cao-nhat" -> Sort.by("rating").descending();
+            case "luot-xem-nhieu-nhat" -> Sort.by("viewCount").descending();
+            default -> Sort.by("createdAt").descending();
+        };
+
+        // 3. Tạo Pageable (phân trang + sắp xếp)
+        Pageable pageable = PageRequest.of(page - 1, limit, sortOrder);
+
+        // 4. Truy vấn
+        Page<Movie> moviePage = movieRepository.findAdminMovies(safeGenre, year, minRating, pageable);
+
+        // 5. Map entity -> DTO
+        return moviePage.map(movie -> AdminMovieListResponse.builder()
+                .id(movie.getId())
+                .title(movie.getTitle())
+                .movieCode("MOV" + movie.getId())
+                .posterUrl(movie.getPostUrl())
+                .movieType(movie.getMovieType())
+                .releaseYear(movie.getReleaseYear())
+                .rating(movie.getRating())
+                .views(movie.getViewCount())
+                .favorites(movie.getFavorites())
+                .createdAt(movie.getCreatedAt() != null
+                        ? new SimpleDateFormat("yyyy-MM-dd").format(movie.getCreatedAt())
+                        : null)
+                .build());
     }
 }
