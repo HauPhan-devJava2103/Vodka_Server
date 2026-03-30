@@ -3,6 +3,7 @@ package com.vn.vodka_server.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -65,5 +66,7 @@ public interface GenreRepository extends JpaRepository<Genre, Long> {
 
     // Stats: Genre mới tạo gần đây nhất
     Genre findTopByOrderByCreatedAtDesc();
-}
 
+    // Lấy N Record Genre gần nhất
+    List<Genre> findTopByOrderByUpdatedAtDesc(Limit limit);
+}

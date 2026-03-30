@@ -3,6 +3,7 @@ package com.vn.vodka_server.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -54,5 +55,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         // Stats: Đếm tổng Review trong khoảng thời gian (trends)
         @Query("SELECT COUNT(r) FROM Review r WHERE r.createdAt >= :from AND r.createdAt < :to")
         long countByCreatedAtBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+        // Lấy danh sách đánh giá mới nhất
+        @EntityGraph(attributePaths = { "user", "movie" })
+        List<Review> findByOrderByUpdatedAtDesc(Limit limit);
 
 }

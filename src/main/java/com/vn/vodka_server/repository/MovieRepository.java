@@ -100,4 +100,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
         // Tổng yêu thích toàn bộ
         @Query("SELECT COALESCE(SUM(m.favorites), 0) FROM Movie m")
         long sumFavorites();
+
+        // Lấy N Record Movie gần nhất
+        List<Movie> findTopByOrderByUpdatedAtDesc(Limit limit);
+
 }

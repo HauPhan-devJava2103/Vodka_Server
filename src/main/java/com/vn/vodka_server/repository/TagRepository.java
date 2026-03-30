@@ -3,6 +3,7 @@ package com.vn.vodka_server.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -69,4 +70,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
                 GROUP BY t.id, t.name, t.slug, t.createdAt, t.updatedAt
             """)
     Optional<TagAdminProjection> findAdminTagById(@Param("id") Long id);
+
+    // Lấy N Record Tag gần nhất
+    List<Tag> findTopByOrderByUpdatedAtDesc(Limit limit);
 }
