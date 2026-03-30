@@ -26,6 +26,7 @@ import com.vn.vodka_server.repository.ReviewReplyRepository;
 import com.vn.vodka_server.repository.ReviewRepository;
 import com.vn.vodka_server.repository.UserRepository;
 import com.vn.vodka_server.service.ReviewService;
+import com.vn.vodka_server.util.TrendPercent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -83,8 +84,8 @@ public class ReviewServiceImpl implements ReviewService {
         long repliesLastMonth = reviewReplyRepository.countByCreatedAtBetween(startOfLastMonth, endOfLastMonth);
 
         // Tính phần trăm tăng/giảm
-        double reviewsTrendPercent = calculateTrendPercent(reviewsThisMonth, reviewsLastMonth);
-        double repliesTrendPercent = calculateTrendPercent(repliesThisMonth, repliesLastMonth);
+        double reviewsTrendPercent = TrendPercent.calculateTrendPercent(reviewsThisMonth, reviewsLastMonth);
+        double repliesTrendPercent = TrendPercent.calculateTrendPercent(repliesThisMonth, repliesLastMonth);
 
         return ReviewStatsResponse.builder()
                 .totalReviews(totalReviews)
@@ -214,12 +215,6 @@ public class ReviewServiceImpl implements ReviewService {
         if (date == null)
             return "N/A";
         return new SimpleDateFormat("dd/MM/yyyy").format(date);
-    }
-
-    private double calculateTrendPercent(long current, long previous) {
-        if (previous == 0)
-            return current > 0 ? 100 : 0.0;
-        return Math.round((current - previous) * 1000.0 / previous) / 10.0;
     }
 
 }

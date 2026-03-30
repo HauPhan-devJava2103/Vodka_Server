@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vn.vodka_server.dto.request.CreateMovieRequest;
 import com.vn.vodka_server.dto.request.UpdateMovieRequest;
 import com.vn.vodka_server.dto.response.AdminMovieListResponse;
+import com.vn.vodka_server.dto.response.AdminMovieStatsResponse;
 import com.vn.vodka_server.dto.response.ApiResponse;
 import com.vn.vodka_server.dto.response.PaginationMeta;
 import com.vn.vodka_server.service.MovieAdminService;
@@ -82,5 +83,20 @@ public class AdminMovieController {
     public ResponseEntity<ApiResponse> deleteMovie(@PathVariable Long id) {
         movieAdminService.deleteMovie(id);
         return ResponseEntity.ok(ApiResponse.success("Đã xóa phim thành công", null));
+    }
+
+    // Lấy thống kê phim
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse> getMovieStats() {
+        try {
+            AdminMovieStatsResponse result = movieAdminService.getMovieStats();
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .success(true)
+                    .message("Lấy thống kê KPI thành công!")
+                    .data(result)
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
 }

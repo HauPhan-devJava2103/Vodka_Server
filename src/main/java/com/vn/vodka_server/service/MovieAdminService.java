@@ -6,6 +6,7 @@ import com.vn.vodka_server.dto.request.CreateMovieRequest;
 import com.vn.vodka_server.dto.request.UpdateMovieRequest;
 import com.vn.vodka_server.dto.response.AdminMovieDetailResponse;
 import com.vn.vodka_server.dto.response.AdminMovieListResponse;
+import com.vn.vodka_server.dto.response.AdminMovieStatsResponse;
 
 public interface MovieAdminService {
 
@@ -24,4 +25,7 @@ public interface MovieAdminService {
 
     // Xóa phim theo id
     void deleteMovie(Long id);
+
+    // Lấy thống kê phim
+    AdminMovieStatsResponse getMovieStats();
 }

@@ -1,5 +1,7 @@
 package com.vn.vodka_server.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -11,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.text.SimpleDateFormat;
 
 import com.vn.vodka_server.dto.request.CreateMovieRequest;
 import com.vn.vodka_server.dto.request.CreateMovieRequest.GenreInput;
@@ -21,6 +22,8 @@ import com.vn.vodka_server.dto.request.UpdateMovieRequest;
 import com.vn.vodka_server.dto.response.AdminEpisodeResponse;
 import com.vn.vodka_server.dto.response.AdminMovieDetailResponse;
 import com.vn.vodka_server.dto.response.AdminMovieListResponse;
+import com.vn.vodka_server.dto.response.AdminMovieStatsResponse;
+import com.vn.vodka_server.dto.response.AdminMovieStatsResponse.KpiItem;
 import com.vn.vodka_server.dto.response.AdminSeasonResponse;
 import com.vn.vodka_server.dto.response.GenreResponse;
 import com.vn.vodka_server.dto.response.TagResponse;
@@ -39,6 +42,7 @@ import com.vn.vodka_server.repository.SeasonRepository;
 import com.vn.vodka_server.repository.TagRepository;
 import com.vn.vodka_server.repository.WatchHistoryRepository;
 import com.vn.vodka_server.service.MovieAdminService;
+import com.vn.vodka_server.util.TrendPercent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -466,5 +470,68 @@ public class MovieAdminServiceImpl implements MovieAdminService {
         // Xóa movie (cascade tự xóa: seasons, episodes, reviews, replies, favorites,
         // join tables)
         movieRepository.delete(movie);
+    }
+
+    @Override
+    public AdminMovieStatsResponse getMovieStats() {
+
+        long totalMovies = movieRepository.count();
+        double ratingKPI = movieRepository.averageRating();
+        long totalViews = movieRepository.sumViewCount();
+        long totalFavorites = movieRepository.sumFavorites();
+
+        // Thời điểm hiện tại
+        LocalDateTime endOfThisMonth = LocalDateTime.now();
+
+        // Đầu tháng này (Lấy ngày hiện tại, chuyển về mùng 1, thời gian 00:00:00)
+        LocalDateTime startOfThisMonth = endOfThisMonth.toLocalDate().atStartOfDay().withDayOfMonth(1);
+
+        // Đầu tháng trước (Lùi lại đúng 1 tháng từ mốc đầu tháng này)
+        LocalDateTime startOfLastMonth = startOfThisMonth.minusMonths(1);
+
+        // Cuối tháng trước (Dùng chính mốc đầu tháng này làm điểm dừng chặn trên)
+        LocalDateTime endOfLastMonth = startOfThisMonth;
+
+        // Đếm phim trong tháng này và tháng trước
+        long moviesThisMonth = movieRepository.countByCreatedAtBetween(startOfThisMonth, endOfThisMonth);
+        long moviesLastMonth = movieRepository.countByCreatedAtBetween(startOfLastMonth, endOfLastMonth);
+
+        // Đếm lượt xem trong tháng này và tháng trước
+        long viewsThisMonth = movieRepository.sumViewCountBetween(startOfThisMonth, endOfThisMonth);
+        long viewsLastMonth = movieRepository.sumViewCountBetween(startOfLastMonth, endOfLastMonth);
+
+        // Đếm lượt yêu thích trong tháng này và tháng trước
+        long favoritesThisMonth = movieRepository.sumFavoritesBetween(startOfThisMonth, endOfThisMonth);
+        long favoritesLastMonth = movieRepository.sumFavoritesBetween(startOfLastMonth, endOfLastMonth);
+
+        // Tính rating trung bình trong tháng này và tháng trước
+        double ratingsThisMonth = movieRepository.averageRatingBetween(startOfThisMonth, endOfThisMonth);
+        double ratingsLastMonth = movieRepository.averageRatingBetween(startOfLastMonth, endOfLastMonth);
+
+        // Calculate Percent
+        double moviesTrendPercent = TrendPercent.calculateTrendPercent(moviesThisMonth, moviesLastMonth);
+        double viewsTrendPercent = TrendPercent.calculateTrendPercent(viewsThisMonth, viewsLastMonth);
+        double favoritesTrendPercent = TrendPercent.calculateTrendPercent(favoritesThisMonth, favoritesLastMonth);
+        double ratingsTrendPercent = TrendPercent.calculateTrendPercent(ratingsThisMonth, ratingsLastMonth);
+
+        return AdminMovieStatsResponse.builder()
+                .movie(KpiItem.builder()
+                        .value(totalMovies)
+                        .trend(moviesTrendPercent)
+                        .build())
+                .rating(KpiItem.builder()
+                        .value(ratingKPI)
+                        .trend(ratingsTrendPercent)
+                        .build())
+                .views(KpiItem.builder()
+                        .value(totalViews)
+                        .trend(viewsTrendPercent)
+                        .build())
+                .favorites(KpiItem.builder()
+                        .value(totalFavorites)
+                        .trend(favoritesTrendPercent)
+                        .build())
+                .build();
+
     }
 }
