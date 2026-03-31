@@ -42,4 +42,7 @@ public interface WatchHistoryRepository extends JpaRepository<WatchHistory, Long
     // Đếm tổng lượt xem trong khoảng thời gian
     @Query("SELECT COUNT(wh) FROM WatchHistory wh WHERE wh.watchedAt >= :from AND wh.watchedAt <= :to")
     long countByWatchedAtBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+    // Đếm số phim user đã xem
+    long countByUser(User user);
 }

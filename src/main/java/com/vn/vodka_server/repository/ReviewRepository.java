@@ -60,4 +60,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         @EntityGraph(attributePaths = { "user", "movie" })
         List<Review> findByOrderByUpdatedAtDesc(Limit limit);
 
+        // Đếm số review của một user
+        long countByUser(User user);
 }

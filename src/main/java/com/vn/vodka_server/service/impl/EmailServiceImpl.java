@@ -58,4 +58,31 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Gửi email thất bại");
         }
     }
+
+    // Gửi email reset mk
+    @Override
+    public void sendResetPasswordEmail(String toEmail, String newPassword) {
+        try {
+            // Prepare Thymeleaf context
+            Context context = new Context();
+            context.setVariable("email", toEmail);
+            context.setVariable("newPassword", newPassword);
+
+            // Render HTML from template
+            String htmlContent = templateEngine.process("reset-password-email", context);
+
+            // Send email
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(toEmail);
+            helper.setSubject("Mật khẩu mới - VODKA");
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("Reset password email sent to {}", toEmail);
+        } catch (MessagingException e) {
+            log.error("Failed to send reset password email to {}", toEmail, e);
+            throw new RuntimeException("Gửi email thất bại");
+        }
+    }
 }
