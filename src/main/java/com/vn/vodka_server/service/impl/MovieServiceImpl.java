@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
@@ -170,7 +171,11 @@ public class MovieServiceImpl implements MovieService {
         // API5: Lấy lịch sử xem phim của user
         @Override
         public List<FeaturedMovieResponse> getWatchHistory(String email, int limit) {
+                // Nếu User chưa đăng nhập (email null), trả về danh sách rỗng
+                if (email == null)
+                        return Collections.emptyList();
 
+                // Tìm user
                 User user = userRepository.findByEmail(email)
                                 .orElseThrow(() -> new RuntimeException(
                                                 "Không tìm thấy tài khoản với email: " + email));

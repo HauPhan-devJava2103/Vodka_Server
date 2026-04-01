@@ -70,8 +70,9 @@ public class MovieController {
     public ResponseEntity<ApiResponse> getWatchHistory(
             Principal principal,
             @RequestParam(defaultValue = "5") int limit) {
+        String email = (principal != null) ? principal.getName() : null;
         return ResponseEntity.ok(ApiResponse.success("Success",
-                movieService.getWatchHistory(principal.getName(), limit)));
+                movieService.getWatchHistory(email, limit)));
     }
 
     // API6: Lấy phim mới cập nhật gần đây
