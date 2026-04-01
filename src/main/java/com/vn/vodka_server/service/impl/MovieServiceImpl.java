@@ -542,4 +542,20 @@ public class MovieServiceImpl implements MovieService {
                 }
         }
 
+        @Override
+        public boolean checkIsFavorite(Long movieId, String email) {
+                if (email == null)
+                        return false;
+
+                Optional<User> userOpt = userRepository.findByEmail(email);
+                if (userOpt.isEmpty())
+                        return false;
+
+                Optional<Movie> movieOpt = movieRepository.findById(movieId);
+                if (movieOpt.isEmpty())
+                        return false;
+
+                return favoriteRepository.findByUserAndMovie(userOpt.get(), movieOpt.get()).isPresent();
+        }
+
 }

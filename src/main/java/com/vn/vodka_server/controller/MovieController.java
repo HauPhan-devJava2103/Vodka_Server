@@ -185,4 +185,17 @@ public class MovieController {
         }
 
     }
+
+    // Kiểm tra phim đã yêu thích hay chưa
+    @GetMapping("/{id}/favorite-status")
+    public ResponseEntity<ApiResponse> getFavoriteStatus(
+            @PathVariable Long id,
+            Principal principal) {
+
+        String email = principal != null ? principal.getName() : null;
+
+        boolean isFavorite = movieService.checkIsFavorite(id, email);
+
+        return ResponseEntity.ok(ApiResponse.success("Lấy trạng thái yêu thích thành công", isFavorite));
+    }
 }

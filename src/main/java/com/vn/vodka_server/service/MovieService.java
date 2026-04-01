@@ -53,4 +53,7 @@ public interface MovieService {
     Object createReview(CreateReviewRequest request, String email);
 
     boolean toggleFavorite(Long movieId, String email);
+
+    // Kiểm tra phim đã yêu thích hay chưa
+    boolean checkIsFavorite(Long movieId, String email);
 }
