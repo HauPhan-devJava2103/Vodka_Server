@@ -5,6 +5,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vn.vodka_server.util.EGender;
+import com.vn.vodka_server.util.ERole;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,5 @@ public class UserInfo {
     private String email;
     private String avatarUrl;
     private String provider;
+    private ERole role;
 }
