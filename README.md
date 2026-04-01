@@ -32,7 +32,6 @@
 
 ### 📊 Quản trị & Thống kê
 * 📈 **Analytics:** Cung cấp dữ liệu thống kê lượt xem, người dùng và đánh giá phim.
-* 📝 **Activity Logging:** Hệ thống nhật ký theo dõi mọi thay đổi quan trọng trên server.
 
 ---
 
