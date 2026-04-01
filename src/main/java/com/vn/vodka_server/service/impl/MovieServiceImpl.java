@@ -486,6 +486,11 @@ public class MovieServiceImpl implements MovieService {
                                         .build();
                         review = reviewRepository.save(review);
 
+                        // Tính lại điểm trung bình rating của phim
+                        double avgRating = reviewRepository.averageRatingByMovieId(movie.getId());
+                        movie.setRating(Math.round(avgRating * 10.0) / 10.0); // Làm tròn 1 chữ số thập phân
+                        movieRepository.save(movie);
+
                         // Trả về ReviewResponse với replied rỗng
                         return ReviewResponse.builder()
                                         .id(review.getId())
@@ -535,17 +540,25 @@ public class MovieServiceImpl implements MovieService {
                                 .orElseThrow(() -> new ResourceNotFoundException("Movie không tồn tại"));
 
                 Optional<Favorite> favorite = favoriteRepository.findByUserAndMovie(user, movie);
+                boolean isFavorited;
                 if (favorite.isPresent()) {
                         favoriteRepository.delete(favorite.get());
-                        return false;
+                        isFavorited = false;
                 } else {
                         Favorite newFavorite = Favorite.builder()
                                         .user(user)
                                         .movie(movie)
                                         .build();
                         favoriteRepository.save(newFavorite);
-                        return true;
+                        isFavorited = true;
                 }
+
+                // Cập nhật lại số lượng yêu thích thực tế trên Movie
+                long totalFavorites = favoriteRepository.countByMovie(movie);
+                movie.setFavorites(totalFavorites);
+                movieRepository.save(movie);
+
+                return isFavorited;
         }
 
         @Override

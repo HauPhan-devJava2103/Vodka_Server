@@ -14,4 +14,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     Page<Favorite> findByUserOrderByCreatedAtDesc(User user, org.springframework.data.domain.Pageable pageable);
 
     Optional<Favorite> findByUserAndMovie(User user, Movie movie);
+
+    // Đếm tổng số user yêu thích phim
+    long countByMovie(Movie movie);
 }

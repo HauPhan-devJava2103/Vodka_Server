@@ -24,7 +24,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         // Tổng số Review
         Long countByMovieId(Long movieId);
 
-        // Lấy danh sách đánh giá theo movie id
+        // Tính trung bình rating của 1 phim cụ thể
+        @Query("SELECT COALESCE(AVG(r.rating), 0) FROM Review r WHERE r.movie.id = :movieId")
+        double averageRatingByMovieId(@Param("movieId") Long movieId);
+
+        // Lấy danh sách đánh giá theo movie id
         Page<Review> findByMovieIdOrderByCreatedAtDesc(Long movieId, Pageable pageable);
 
         // Lấy danh sách đánh giá của tôi
