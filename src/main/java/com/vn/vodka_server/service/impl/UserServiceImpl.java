@@ -92,6 +92,7 @@ public class UserServiceImpl implements UserService {
                 .phone(user.getPhone())
                 .avatarUrl(user.getAvatarUrl())
                 .provider(user.getProvider() != null ? user.getProvider().name() : "LOCAL")
+                .role(user.getRole())
                 .build();
     }
 
