@@ -1,5 +1,6 @@
 package com.vn.vodka_server.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -21,29 +22,33 @@ public class DataSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${admin.email}")
+    private String adminEmail;
+
+    @Value("${admin.password}")
+    private String adminPassword;
+
     @Override
     public void run(String... args) {
         seedAdminAccount();
     }
 
     private void seedAdminAccount() {
-        String adminEmail = "admin@gmail.com";
-
         if (userRepository.existsByEmail(adminEmail)) {
-            log.info("Tài khoản email admin đã tồn tại hệ thống.");
+            log.info("Tài khoản email admin đã tồn tại hệ thống.");
             return;
         }
 
         User admin = User.builder()
                 .fullName("Administrator")
                 .email(adminEmail)
-                .password(passwordEncoder.encode("admin123"))
+                .password(passwordEncoder.encode(adminPassword))
                 .role(ERole.ADMIN)
                 .status(EStatus.ACTIVE)
                 .provider(EProvider.LOCAL)
                 .build();
 
         userRepository.save(admin);
-        log.info("Tài khoản email admin đã được tạo thành công (email: {})", adminEmail);
+        log.info("Tài khoản email admin đã được tạo thành công (email: {})", adminEmail);
     }
 }
