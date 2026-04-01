@@ -65,7 +65,7 @@ public class MovieController {
                 movieService.getTrendingMovies(limit)));
     }
 
-    // API5: Lấy lịch sử xem phim của user
+    // API5: Lấy lịch sử xem phim của users
     @GetMapping("/history")
     public ResponseEntity<ApiResponse> getWatchHistory(
             Principal principal,
