@@ -1,10 +1,11 @@
 package com.vn.vodka_server.service.impl;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.Collections;
 
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
@@ -561,6 +562,39 @@ public class MovieServiceImpl implements MovieService {
                         return false;
 
                 return favoriteRepository.findByUserAndMovie(userOpt.get(), movieOpt.get()).isPresent();
+        }
+
+        // Lưu lịch sử xem phim của user
+        @Override
+        public void recordHistory(Long movieId, String email) {
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Không tìm thấy tài khoản với email: " + email));
+
+                Movie movie = movieRepository.findById(movieId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Phim với id = " + movieId + " không tồn tại"));
+
+                Optional<WatchHistory> existingHistory = watchHistoryRepository.findByUserAndMovie(user, movie);
+
+                if (existingHistory.isPresent()) {
+                        // Đã xem trước
+                        WatchHistory history = existingHistory.get();
+                        history.setWatchedAt(new Date());
+                        watchHistoryRepository.save(history);
+                } else {
+                        // Lần đầu xem tạo bản ghi mới + tăng viewCount
+                        WatchHistory newHistory = WatchHistory.builder()
+                                        .user(user)
+                                        .movie(movie)
+                                        .watchedAt(new Date())
+                                        .build();
+                        watchHistoryRepository.save(newHistory);
+
+                        // Tăng viewCount của phim
+                        movie.setViewCount((movie.getViewCount() != null ? movie.getViewCount() : 0) + 1);
+                        movieRepository.save(movie);
+                }
         }
 
 }

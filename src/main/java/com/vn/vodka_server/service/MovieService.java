@@ -56,4 +56,7 @@ public interface MovieService {
 
     // Kiểm tra phim đã yêu thích hay chưa
     boolean checkIsFavorite(Long movieId, String email);
+
+    // Lưu lịch sử xem phim của user
+    void recordHistory(Long movieId, String email);
 }

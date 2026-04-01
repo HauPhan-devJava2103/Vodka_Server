@@ -199,4 +199,18 @@ public class MovieController {
 
         return ResponseEntity.ok(ApiResponse.success("Lấy trạng thái yêu thích thành công", isFavorite));
     }
+
+    // Record-History Movie
+    @PostMapping("/{movieId}/record-history")
+    public ResponseEntity<ApiResponse> recordHistory(
+            @PathVariable Long movieId,
+            Principal principal) {
+        try {
+            movieService.recordHistory(movieId, principal.getName());
+            return ResponseEntity.ok(ApiResponse.success("Lưu lịch sử xem phim thành công", null));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
+        }
+    }
+
 }
