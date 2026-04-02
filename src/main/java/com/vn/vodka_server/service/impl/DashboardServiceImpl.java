@@ -30,6 +30,7 @@ import com.vn.vodka_server.repository.TagRepository;
 import com.vn.vodka_server.repository.UserRepository;
 import com.vn.vodka_server.repository.WatchHistoryRepository;
 import com.vn.vodka_server.service.DashboardService;
+import com.vn.vodka_server.util.ERole;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,7 +54,7 @@ public class DashboardServiceImpl implements DashboardService {
                 LocalDateTime endOfLastMonth = startOfThisMonth;
 
                 long totalMovies = movieRepository.count();
-                long totalUsers = userRepository.count();
+                long totalUsers = userRepository.countByRole(ERole.USER);
                 long totalReviews = reviewRepository.count();
                 long totalTags = tagRepository.count();
                 long totalViews = movieRepository.sumViewCount();
@@ -61,8 +62,10 @@ public class DashboardServiceImpl implements DashboardService {
                 // Trend
                 long moviesThisMonth = movieRepository.countByCreatedAtBetween(startOfThisMonth, endOfThisMonth);
                 long moviesLastMonth = movieRepository.countByCreatedAtBetween(startOfLastMonth, endOfLastMonth);
-                long usersThisMonth = userRepository.countByCreatedAtBetween(startOfThisMonth, endOfThisMonth);
-                long usersLastMonth = userRepository.countByCreatedAtBetween(startOfLastMonth, endOfLastMonth);
+                long usersThisMonth = userRepository.countByRoleAndCreatedAtBetween(ERole.USER, startOfThisMonth,
+                                endOfThisMonth);
+                long usersLastMonth = userRepository.countByRoleAndCreatedAtBetween(ERole.USER, startOfLastMonth,
+                                endOfLastMonth);
                 long reviewsThisMonth = reviewRepository.countByCreatedAtBetween(startOfThisMonth, endOfThisMonth);
                 long reviewsLastMonth = reviewRepository.countByCreatedAtBetween(startOfLastMonth, endOfLastMonth);
                 long viewsThisMonth = watchHistoryRepository.countByWatchedAtBetween(startOfThisMonth, endOfThisMonth);
