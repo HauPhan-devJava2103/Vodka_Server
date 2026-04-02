@@ -103,7 +103,7 @@ mvn spring-boot:run
 * **Nhóm thực hiện:**
     * **Trương Hoài Chương**
     * **Phan Phúc Hậu**
-    * **Nguyễn Hữu Văn**
+    * **Lê Hữu Văn**
 * **Môn học:** Công nghệ phần mềm hướng đối tượng (OOSE)
 * **Trường:** Đại học Công nghệ Kỹ thuật TP.HCM (HCMUTE)
 
